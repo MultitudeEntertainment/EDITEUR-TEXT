@@ -2,362 +2,629 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <title>Éditeur + Recherche Web + Assistant IA</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <!--
-    Application web tout-en-un :
-    - Éditeur type Word
-    - Recherche web intégrée
-    - Assistant texte + vocal (questions / réponses en français)
-  -->
-
+  <title>Éditeur + Web intégré</title>
   <style>
-    /* ========= RESET SIMPLE ========= */
+    :root {
+      --bg: #0b1020;
+      --bg-alt: #12172a;
+      --accent: #ffb300;
+      --accent-soft: rgba(255, 179, 0, 0.16);
+      --text: #f5f5f5;
+      --muted: #9ca3af;
+      --border: #1f2933;
+      --danger: #f97373;
+      --radius-lg: 14px;
+      --radius-md: 10px;
+      --radius-sm: 6px;
+      --shadow-soft: 0 18px 45px rgba(0, 0, 0, 0.55);
+      --shadow-subtle: 0 0 0 1px rgba(255, 255, 255, 0.02);
+      --blur: 18px;
+      --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+        "Segoe UI", sans-serif;
+      --transition-fast: 0.16s ease-out;
+      --transition-med: 0.22s ease-out;
+    }
+
     * {
       box-sizing: border-box;
     }
 
-    html, body {
+    html,
+    body {
       margin: 0;
       padding: 0;
       height: 100%;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: #e5eaef;
-      color: #111827;
+      background: radial-gradient(circle at top, #1e293b 0, #020617 55%);
+      color: var(--text);
+      font-family: var(--font-sans);
+      -webkit-font-smoothing: antialiased;
     }
 
     body {
       display: flex;
+      align-items: stretch;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .app-shell {
+      width: 100%;
+      max-width: 1300px;
+      height: 100%;
+      max-height: 780px;
+      border-radius: 22px;
+      background: radial-gradient(circle at 0 0, rgba(255, 179, 0, 0.12), transparent 60%),
+                  radial-gradient(circle at 100% 0, rgba(56, 189, 248, 0.12), transparent 55%),
+                  rgba(4, 7, 23, 0.9);
+      backdrop-filter: blur(var(--blur));
+      box-shadow: var(--shadow-soft), var(--shadow-subtle);
+      padding: 16px 18px 18px;
+      display: flex;
       flex-direction: column;
+      border: 1px solid rgba(148, 163, 184, 0.24);
+      position: relative;
       overflow: hidden;
     }
 
-    /* ========= HEADER ========= */
-    header {
-      padding: 8px 10px;
-      background: #f3f4f6;
-      border-bottom: 1px solid #d1d5db;
+    .app-shell::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(120deg, rgba(255, 255, 255, 0.12), transparent 65%),
+        radial-gradient(circle at top, rgba(255, 255, 255, 0.12), transparent 60%);
+      mix-blend-mode: soft-light;
+      opacity: 0.2;
+      pointer-events: none;
+    }
+
+    .app-inner {
+      position: relative;
+      z-index: 1;
       display: flex;
-      flex-wrap: wrap;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .titlebar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      gap: 10px;
+    }
+
+    .titlebar-left {
+      display: flex;
       align-items: center;
       gap: 8px;
-      z-index: 10;
     }
 
-    header h1 {
-      font-size: 18px;
-      margin: 0;
-      white-space: nowrap;
-    }
-
-    .header-right {
+    .traffic-lights {
       display: flex;
-      flex-wrap: wrap;
       gap: 6px;
+    }
+
+    .traffic-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 30%, #fff, rgba(255, 255, 255, 0)) border-box;
+      position: relative;
+    }
+
+    .traffic-dot::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      mix-blend-mode: soft-light;
+    }
+
+    .traffic-dot.red {
+      background-color: #ff5f57;
+    }
+
+    .traffic-dot.amber {
+      background-color: #febc2e;
+    }
+
+    .traffic-dot.green {
+      background-color: #28c840;
+    }
+
+    .app-title {
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      font-size: 13px;
+      text-transform: uppercase;
+      color: #e5e7eb;
+      display: flex;
       align-items: center;
-      margin-left: auto;
+      gap: 8px;
     }
 
-    input[type="text"],
-    select {
-      padding: 6px 10px;
-      border-radius: 8px;
-      border: 1px solid #cbd5e1;
-      background: #ffffff;
-      color: #111827;
-      font-size: 12px;
-      max-width: 190px;
+    .app-title-pill {
+      font-size: 11px;
+      color: var(--accent);
+      background: rgba(180, 83, 9, 0.24);
+      border-radius: 999px;
+      padding: 2px 8px;
+      border: 1px solid rgba(248, 250, 252, 0.1);
     }
 
-    button {
-      border: 1px solid #cbd5e1;
-      border-radius: 8px;
-      padding: 6px 10px;
-      font-size: 12px;
-      cursor: pointer;
-      font-weight: 500;
+    .titlebar-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+    }
+
+    .badge {
       display: inline-flex;
       align-items: center;
-      gap: 4px;
-      transition: background 0.15s ease, border-color 0.15s ease;
-      background: #ffffff;
-      color: #111827;
-      white-space: nowrap;
+      gap: 6px;
+      padding: 4px 9px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 0 0, rgba(248, 250, 252, 0.16), transparent 60%),
+                  linear-gradient(135deg, rgba(15, 23, 42, 0.6), rgba(15, 23, 42, 0.95));
+      border: 1px solid rgba(148, 163, 184, 0.55);
+      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(12px);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #e5e7eb;
     }
 
-    button:hover {
-      background: #e5e7eb;
-      border-color: #9ca3af;
+    .badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 30%, #22c55e, #166534);
+      box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.2);
     }
 
-    .btn-primary {
-      background: #2563eb;
-      color: #f9fafb;
-      border-color: #1d4ed8;
+    .main {
+      flex: 1;
+      display: flex;
+      gap: 14px;
+      min-height: 0;
     }
 
-    .btn-primary:hover {
-      background: #1d4ed8;
-      border-color: #1d4ed8;
+    .left-pane,
+    .right-pane {
+      background: radial-gradient(circle at top left, rgba(255, 179, 0, 0.08), transparent 60%),
+                  linear-gradient(145deg, rgba(15, 23, 42, 0.96), rgba(15, 23, 42, 0.9));
+      border-radius: 18px;
+      padding: 12px;
+      box-shadow: 0 14px 38px rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.42);
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      position: relative;
+      overflow: hidden;
     }
 
-    .btn-danger {
-      background: #ef4444;
-      color: #fef2f2;
-      border-color: #b91c1c;
+    .left-pane {
+      flex: 1.4;
     }
 
-    .btn-danger:hover {
-      background: #dc2626;
-      border-color: #b91c1c;
+    .right-pane {
+      flex: 1;
     }
 
-    /* ========= TABS ========= */
+    .right-pane::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top right, rgba(56, 189, 248, 0.16), transparent 65%);
+      opacity: 0.7;
+      pointer-events: none;
+    }
+
+    .pane-inner {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
     .tabs {
       display: flex;
-      background: #ffffff;
-      border-bottom: 1px solid #d1d5db;
+      gap: 6px;
+      padding: 2px;
+      border-radius: 999px;
+      background: radial-gradient(circle at top, rgba(255, 255, 255, 0.08), transparent 70%);
+      border: 1px solid rgba(148, 163, 184, 0.55);
+      box-shadow: 0 10px 28px rgba(15, 23, 42, 0.95);
+      align-self: flex-start;
+      margin-bottom: 10px;
+      position: relative;
     }
 
     .tab {
-      padding: 10px 14px;
+      position: relative;
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 12px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      border: none;
+      background: transparent;
+      color: var(--muted);
       cursor: pointer;
-      border-right: 1px solid #e5e7eb;
-      font-size: 13px;
       display: flex;
       align-items: center;
-      gap: 4px;
+      gap: 6px;
+      transition: color var(--transition-fast), transform var(--transition-fast), opacity var(--transition-fast);
+      z-index: 1;
+      white-space: nowrap;
     }
 
-    .tab span.icon {
-      font-size: 14px;
+    .tab-icon {
+      font-size: 13px;
+    }
+
+    .tab-active-indicator {
+      position: absolute;
+      top: 2px;
+      bottom: 2px;
+      width: 50%;
+      border-radius: 999px;
+      background: radial-gradient(circle at 0 0, rgba(248, 250, 252, 0.7), transparent 55%),
+                  linear-gradient(135deg, #1f2937, #020617);
+      box-shadow: 0 12px 20px rgba(15, 23, 42, 0.9);
+      transform: translateX(0%);
+      transition: transform var(--transition-med);
     }
 
     .tab.active {
-      background: #2563eb;
-      color: #f9fafb;
-      border-bottom: 2px solid #1d4ed8;
+      color: #e5e7eb;
+      text-shadow: 0 0 12px rgba(255, 255, 255, 0.55);
     }
 
-    /* ========= MAIN / VIEWS ========= */
-    main {
+    .status-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      color: var(--muted);
+      margin-bottom: 8px;
+      gap: 8px;
+    }
+
+    .status-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 30%, var(--accent), #b45309);
+      box-shadow: 0 0 0 4px rgba(250, 204, 21, 0.2);
+    }
+
+    .status-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .status-pill {
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.95));
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .status-pill-key {
+      font-size: 10px;
+      padding: 2px 5px;
+      border-radius: 4px;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      background: rgba(15, 23, 42, 0.85);
+      color: #e5e7eb;
+      letter-spacing: 0.06em;
+    }
+
+    .editor-container {
       flex: 1;
       display: flex;
       flex-direction: column;
-      overflow: hidden;
+      gap: 8px;
+      min-height: 0;
     }
 
-    .view {
-      flex: 1;
-      display: none;
-      overflow: hidden;
-      padding: 10px;
-    }
-
-    .view.active {
-      display: flex;
-      flex-direction: column;
-    }
-
-    /* ========= TOOLBAR ÉDITEUR ========= */
     .toolbar {
-      background: #f9fafb;
-      border-radius: 10px;
-      border: 1px solid #d1d5db;
-      padding: 4px 6px;
       display: flex;
       flex-wrap: wrap;
-      gap: 4px;
+      gap: 6px;
+      padding: 6px;
+      border-radius: 12px;
+      background: radial-gradient(circle at top, rgba(148, 163, 184, 0.2), transparent 70%),
+                  linear-gradient(145deg, rgba(15, 23, 42, 0.98), rgba(15, 23, 42, 0.96));
+      border: 1px solid rgba(148, 163, 184, 0.75);
+      box-shadow: 0 10px 26px rgba(15, 23, 42, 0.9);
       align-items: center;
-      margin-bottom: 8px;
     }
 
-    .toolbar button {
-      border-radius: 6px;
-      padding: 3px 8px;
+    .toolbar-group {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px;
+      border-radius: 999px;
+      background: radial-gradient(circle at top, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.96));
+      border: 1px solid rgba(30, 64, 175, 0.5);
+      box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.6);
+    }
+
+    .toolbar-button {
+      border-radius: 999px;
+      border: none;
+      background: transparent;
+      color: #e5e7eb;
+      padding: 5px 9px;
       font-size: 12px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      transition: background var(--transition-fast), color var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast);
+      position: relative;
     }
 
-    .toolbar select {
-      border-radius: 6px;
+    .toolbar-button span {
       font-size: 11px;
-      padding: 3px 6px;
-      max-width: 160px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .toolbar-button:hover {
+      background: radial-gradient(circle at 0 0, rgba(248, 250, 252, 0.12), transparent 70%);
+      transform: translateY(-0.5px);
+      box-shadow: 0 0 0 1px rgba(148, 163, 184, 0.7);
+    }
+
+    .toolbar-button.primary {
+      background: radial-gradient(circle at 0 0, rgba(250, 250, 250, 0.65), transparent 55%),
+                  linear-gradient(135deg, #f59e0b, #b45309);
+      color: #111827;
+      font-weight: 600;
+      box-shadow: 0 12px 20px rgba(251, 191, 36, 0.45);
+    }
+
+    .toolbar-button.primary:hover {
+      box-shadow: 0 14px 26px rgba(251, 191, 36, 0.6);
+      transform: translateY(-1px);
+    }
+
+    .toolbar-button-icon {
+      font-size: 14px;
     }
 
     .toolbar-divider {
       width: 1px;
       height: 22px;
-      background: #d1d5db;
-      margin: 0 4px;
+      background: linear-gradient(to bottom, transparent, rgba(148, 163, 184, 0.8), transparent);
+      margin: 0 2px;
     }
 
-    /* ========= PAGE + ÉDITEUR ========= */
-    .page-wrapper {
-      flex: 1;
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      overflow: auto;
-    }
-
-    .page {
-      background: #ffffff;
-      color: #000000;
-      border-radius: 4px;
-      box-shadow:
-        0 16px 28px rgba(15, 23, 42, 0.2),
-        0 0 0 1px rgba(148, 163, 184, 0.4);
-      padding: 20px 24px;
-      max-width: 900px;
-      width: 100%;
-      min-height: 80vh;
-    }
-
-    #editor {
-      outline: none;
-      min-height: 70vh;
-      white-space: pre-wrap;
-    }
-
-    #editor.empty::before {
-      content: "Commence à écrire ou utilise la dictée vocale…";
-      color: #9ca3af;
-    }
-
-    .status-bar {
-      margin-top: 6px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 11px;
-      color: #6b7280;
-      max-width: 900px;
-      width: 100%;
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    .mic-status {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-
-    .dot {
-      width: 8px;
-      height: 8px;
+    .toolbar-select {
       border-radius: 999px;
-      background: #ef4444;
-      box-shadow: 0 0 0 4px rgba(248, 113, 113, 0.5);
-      display: none;
-    }
-
-    .dot.active {
-      display: inline-block;
-      animation: pulse 1s infinite;
-    }
-
-    @keyframes pulse {
-      0% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(1.4); opacity: 0.6; }
-      100% { transform: scale(1); opacity: 1; }
-    }
-
-    /* ========= RECHERCHE WEB ========= */
-    .search-bar {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 8px;
-      align-items: center;
-    }
-
-    .search-bar input[type="text"] {
-      flex: 1;
-      max-width: none;
-    }
-
-    .search-info {
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      background: radial-gradient(circle at 0 0, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.98));
+      color: #e5e7eb;
+      padding: 3px 9px;
       font-size: 12px;
-      color: #4b5563;
-      margin-bottom: 6px;
+      cursor: pointer;
     }
 
-    .search-result-frame {
+    .editor {
       flex: 1;
-      border-radius: 8px;
-      border: 1px solid #d1d5db;
-      overflow: hidden;
-      background: #ffffff;
+      border-radius: 14px;
+      background: radial-gradient(circle at top left, rgba(248, 250, 252, 0.1), transparent 65%),
+                  linear-gradient(145deg, rgba(15, 23, 42, 0.98), rgba(15, 23, 42, 0.98));
+      border: 1px solid rgba(148, 163, 184, 0.65);
+      padding: 14px;
+      overflow: auto;
+      box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.95), 0 12px 30px rgba(15, 23, 42, 0.95);
+      position: relative;
     }
 
-    .search-result-frame iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
+    .editor[contenteditable="true"]:empty::before {
+      content: "Commence à écrire ici…";
+      color: rgba(148, 163, 184, 0.85);
     }
 
-    /* ========= ASSISTANT ========= */
-    .assistant-container {
+    .editor:focus-visible {
+      outline: none;
+      box-shadow: inset 0 0 0 1px rgba(250, 204, 21, 0.75), 0 0 0 1px rgba(250, 204, 21, 0.5),
+                  0 16px 36px rgba(250, 204, 21, 0.2);
+    }
+
+    .editor-content {
+      font-size: 14px;
+      line-height: 1.6;
+      color: #e5e7eb;
+      min-height: 100%;
+    }
+
+    .web-container {
       flex: 1;
-      display: flex;
-      justify-content: center;
-      align-items: stretch;
-      overflow: hidden;
-    }
-
-    .assistant-box {
-      max-width: 900px;
-      width: 100%;
       display: flex;
       flex-direction: column;
       gap: 8px;
+      min-height: 0;
+    }
+
+    .web-search-bar {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px;
+      border-radius: 12px;
+      background: radial-gradient(circle at top, rgba(148, 163, 184, 0.22), transparent 70%),
+                  linear-gradient(145deg, rgba(15, 23, 42, 0.98), rgba(15, 23, 42, 0.96));
+      border: 1px solid rgba(148, 163, 184, 0.8);
+      box-shadow: 0 10px 26px rgba(15, 23, 42, 0.9);
+    }
+
+    .web-search-input {
+      flex: 1;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      background: rgba(15, 23, 42, 0.97);
+      color: #e5e7eb;
+      padding: 7px 11px;
+      font-size: 13px;
+      outline: none;
+      box-shadow: inset 0 0 0 1px rgba(15, 23, 42, 0.9);
+    }
+
+    .web-search-input::placeholder {
+      color: rgba(148, 163, 184, 0.8);
+    }
+
+    .web-search-input:focus {
+      border-color: rgba(250, 204, 21, 0.9);
+      box-shadow: 0 0 0 1px rgba(250, 204, 21, 0.7);
+    }
+
+    .web-button {
+      border-radius: 999px;
+      border: none;
+      background: radial-gradient(circle at 0 0, rgba(248, 250, 252, 0.7), transparent 55%),
+                  linear-gradient(135deg, #22c55e, #15803d);
+      color: #022c22;
+      font-weight: 600;
+      padding: 7px 14px;
+      font-size: 12px;
+      cursor: pointer;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      box-shadow: 0 12px 22px rgba(34, 197, 94, 0.5);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .web-button:hover {
+      box-shadow: 0 14px 26px rgba(34, 197, 94, 0.7);
+      transform: translateY(-1px);
+    }
+
+    .web-iframe-wrapper {
+      flex: 1;
+      border-radius: 14px;
+      background: radial-gradient(circle at top, rgba(15, 23, 42, 0.85), rgba(15, 23, 42, 0.98));
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      overflow: hidden;
+      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.95);
+      position: relative;
+    }
+
+    .web-iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      background: #020617;
+    }
+
+    .web-placeholder {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: 13px;
+      color: rgba(148, 163, 184, 0.9);
+      pointer-events: none;
+      text-align: center;
+      padding: 0 20px;
+    }
+
+    .web-placeholder-title {
+      font-size: 14px;
+      font-weight: 500;
+      color: #e5e7eb;
+    }
+
+    .web-placeholder-badge {
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px dashed rgba(148, 163, 184, 0.8);
+      background: rgba(15, 23, 42, 0.92);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
     }
 
     .assistant-header {
-      font-size: 14px;
-      font-weight: 600;
-      color: #111827;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      gap: 8px;
+    }
+
+    .assistant-title {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #e5e7eb;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .assistant-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-height: 0;
     }
 
     .assistant-messages {
       flex: 1;
+      border-radius: 14px;
+      background: radial-gradient(circle at 0 0, rgba(56, 189, 248, 0.4), transparent 55%),
+                  linear-gradient(145deg, rgba(15, 23, 42, 0.98), rgba(15, 23, 42, 0.96));
+      border: 1px solid rgba(56, 189, 248, 0.9);
       padding: 10px;
-      border-radius: 8px;
-      border: 1px solid #d1d5db;
-      background: #ffffff;
       overflow-y: auto;
-      font-size: 14px;
+      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.98);
+      font-size: 13px;
     }
 
     .assistant-message {
       margin-bottom: 8px;
-      padding: 6px 8px;
-      border-radius: 6px;
-      max-width: 80%;
+      line-height: 1.5;
     }
 
     .assistant-message.user {
-      background: #dbeafe;
-      margin-left: auto;
       text-align: right;
+      color: #f9fafb;
     }
 
-    .assistant-message.bot {
-      background: #f3f4f6;
-      margin-right: auto;
-      text-align: left;
-    }
-
-    .assistant-input-area {
-      border-radius: 8px;
-      border: 1px solid #d1d5db;
-      background: #f9fafb;
-      padding: 8px;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
+    .assistant-message.assistant {
+      color: #e0f2fe;
     }
 
     .assistant-input-row {
@@ -366,898 +633,421 @@
       align-items: center;
     }
 
-    .assistant-input-row textarea {
+    .assistant-input {
       flex: 1;
-      resize: vertical;
-      min-height: 48px;
-      max-height: 120px;
-      border-radius: 6px;
-      border: 1px solid #d1d5db;
-      padding: 6px 8px;
-      font-family: inherit;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.8);
+      background: rgba(15, 23, 42, 0.97);
+      color: #e5e7eb;
+      padding: 7px 11px;
       font-size: 13px;
+      outline: none;
     }
 
-    .assistant-info {
+    .assistant-input::placeholder {
+      color: rgba(148, 163, 184, 0.8);
+    }
+
+    .assistant-button {
+      border-radius: 999px;
+      border: none;
+      background: radial-gradient(circle at 0 0, rgba(248, 250, 252, 0.75), transparent 55%),
+                  linear-gradient(135deg, #38bdf8, #0369a1);
+      color: #02131d;
+      font-weight: 600;
+      padding: 7px 10px;
+      font-size: 12px;
+      cursor: pointer;
+      box-shadow: 0 10px 22px rgba(56, 189, 248, 0.55);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .assistant-button:hover {
+      box-shadow: 0 12px 26px rgba(56, 189, 248, 0.7);
+      transform: translateY(-1px);
+    }
+
+    .assistant-footer {
+      font-size: 10px;
+      color: rgba(148, 163, 184, 0.9);
+      text-align: right;
+      margin-top: 3px;
+    }
+
+    .hint {
       font-size: 11px;
-      color: #6b7280;
+      color: rgba(148, 163, 184, 0.9);
+      margin-top: 5px;
     }
 
-    /* ========= RESPONSIVE ========= */
-    @media (max-width: 900px) {
-      header {
+    .hint strong {
+      color: #e5e7eb;
+      font-weight: 500;
+    }
+
+    @media (max-width: 1100px) {
+      .app-shell {
+        max-height: none;
+        height: 100%;
+      }
+      .main {
+        flex-direction: column;
+      }
+      .left-pane,
+      .right-pane {
+        flex: none;
+        min-height: 260px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      body {
+        padding: 8px;
+      }
+      .app-shell {
+        padding: 10px;
+        border-radius: 18px;
+      }
+      .titlebar {
         flex-direction: column;
         align-items: flex-start;
+        gap: 6px;
       }
-      .header-right {
-        margin-left: 0;
-        width: 100%;
-        justify-content: flex-start;
-      }
-      .page {
-        padding: 12px;
+      .badge {
+        display: none;
       }
       .toolbar {
-        font-size: 11px;
+        justify-content: flex-start;
       }
-    }
-
-    @media (max-width: 600px) {
-      .tabs {
+      .titlebar-right {
+        font-size: 10px;
         flex-wrap: wrap;
-      }
-      .tab {
-        flex: 1 1 auto;
-        justify-content: center;
-      }
-      .assistant-input-row {
-        flex-direction: column;
-        align-items: stretch;
-      }
-      .assistant-input-row button {
-        width: 100%;
-        justify-content: center;
-      }
-      .search-bar {
-        flex-direction: column;
-        align-items: stretch;
-      }
-      .search-bar button {
-        width: 100%;
-        justify-content: center;
       }
     }
   </style>
 </head>
 <body>
-
-<header>
-  <h1>Éditeur + Recherche + Assistant</h1>
-
-  <div class="header-right">
-    <input id="docName" type="text" placeholder="Nom du document" />
-
-    <button id="newDocBtn" title="Créer un nouveau document">
-      Nouveau
-    </button>
-
-    <button id="saveDocBtn" class="btn-primary" title="Sauvegarder dans ce navigateur">
-      Sauvegarder
-    </button>
-
-    <select id="docList" title="Documents enregistrés">
-      <option value="">Documents enregistrés…</option>
-    </select>
-
-    <button id="deleteDocBtn" class="btn-danger" title="Supprimer le document sélectionné">
-      Supprimer
-    </button>
-
-    <select id="exportFormat" title="Format de téléchargement">
-      <option value="doc">Word (.doc)</option>
-      <option value="html">HTML (.html)</option>
-      <option value="pdf">PDF (.pdf)</option>
-    </select>
-
-    <button id="downloadBtn" title="Télécharger ce document">
-      Télécharger
-    </button>
-
-    <button id="openFileBtn" title="Ouvrir un fichier existant">
-      Ouvrir…
-    </button>
-
-    <input id="fileInput" type="file" accept=".html,.htm,.txt,.doc" style="display:none" />
-  </div>
-</header>
-
-<main>
-  <!-- Onglets -->
-  <div class="tabs">
-    <div class="tab active" data-tab="editorView">
-      <span class="icon">📝</span>
-      <span>Éditeur</span>
-    </div>
-    <div class="tab" data-tab="searchView">
-      <span class="icon">🌐</span>
-      <span>Recherche web</span>
-    </div>
-    <div class="tab" data-tab="assistantView">
-      <span class="icon">🤖</span>
-      <span>Assistant</span>
-    </div>
-  </div>
-
-  <!-- Vue ÉDITEUR -->
-  <section id="editorView" class="view active">
-    <div class="toolbar">
-      <select id="fontSizeSelect" title="Taille">
-        <option value="">Taille</option>
-        <option value="12px">12</option>
-        <option value="14px">14</option>
-        <option value="16px">16</option>
-        <option value="18px">18</option>
-        <option value="24px">24</option>
-        <option value="32px">32</option>
-      </select>
-
-      <div class="toolbar-divider"></div>
-
-      <button data-cmd="bold" title="Gras"><b>G</b></button>
-      <button data-cmd="italic" title="Italique"><i>I</i></button>
-      <button data-cmd="underline" title="Souligné"><u>S</u></button>
-      <button data-cmd="removeFormat" title="Effacer la mise en forme">Effacer</button>
-
-      <div class="toolbar-divider"></div>
-
-      <button data-cmd="formatBlock" data-value="h1" title="Titre 1">Titre 1</button>
-      <button data-cmd="formatBlock" data-value="h2" title="Titre 2">Titre 2</button>
-      <button data-cmd="formatBlock" data-value="p" title="Paragraphe">Paragraphe</button>
-
-      <div class="toolbar-divider"></div>
-
-      <button data-cmd="insertUnorderedList" title="Liste à puces">Liste •</button>
-      <button data-cmd="insertOrderedList" title="Liste numérotée">Liste 1.</button>
-
-      <div class="toolbar-divider"></div>
-
-      <button data-cmd="justifyLeft" title="Aligner à gauche">Gauche</button>
-      <button data-cmd="justifyCenter" title="Centrer">Centre</button>
-      <button data-cmd="justifyRight" title="Aligner à droite">Droite</button>
-
-      <div class="toolbar-divider"></div>
-
-      <label style="font-size:11px;">Texte
-        <input id="colorInput" type="color"
-               style="width:24px;height:20px;border:none;padding:0;margin-left:2px;">
-      </label>
-      <label style="font-size:11px;">Surlignage
-        <input id="bgColorInput" type="color"
-               style="width:24px;height:20px;border:none;padding:0;margin-left:2px;">
-      </label>
-
-      <div class="toolbar-divider"></div>
-
-      <button id="insertImageBtn" title="Insérer une image">Image</button>
-      <button id="insertTableBtn" title="Insérer un tableau">Tableau</button>
-
-      <div class="toolbar-divider"></div>
-
-      <button data-cmd="undo" title="Annuler">Annuler</button>
-      <button data-cmd="redo" title="Rétablir">Rétablir</button>
-
-      <div class="toolbar-divider"></div>
-
-      <button id="startMicBtn" class="btn-primary" title="Démarrer la dictée vocale du document">
-        Dictée document
-      </button>
-      <button id="stopMicBtn" class="btn-danger" title="Arrêter la dictée vocale du document">
-        Stop dictée
-      </button>
-    </div>
-
-    <div class="page-wrapper">
-      <div class="page">
-        <div id="editor" contenteditable="true" class="empty"></div>
+  <div class="app-shell">
+    <div class="app-inner">
+      <div class="titlebar">
+        <div class="titlebar-left">
+          <div class="traffic-lights">
+            <div class="traffic-dot red"></div>
+            <div class="traffic-dot amber"></div>
+            <div class="traffic-dot green"></div>
+          </div>
+          <div class="app-title">
+            Atelier d’écriture
+            <span class="app-title-pill">Éditeur + Web intégré</span>
+          </div>
+        </div>
+        <div class="titlebar-right">
+          <span>Local • Sans compte • Navigateur</span>
+          <span>FR</span>
+          <div class="badge">
+            <span class="badge-dot"></span>
+            <span>Session privée</span>
+          </div>
+        </div>
       </div>
-    </div>
 
-    <div class="status-bar">
-      <div class="mic-status">
-        <span class="dot" id="micDot"></span>
-        <span id="micStatusText"></span>
-      </div>
-      <div id="wordCount">0 mot(s), 0 caractère(s)</div>
-      <div id="storageStatus"></div>
-    </div>
+      <div class="main">
+        <div class="left-pane">
+          <div class="pane-inner">
+            <div class="tabs" id="tabs">
+              <div class="tab-active-indicator" id="tab-indicator"></div>
+              <button class="tab active" data-tab="editor">
+                <span class="tab-icon">✏️</span>
+                <span>Éditeur</span>
+              </button>
+              <button class="tab" data-tab="web">
+                <span class="tab-icon">🌐</span>
+                <span>Web</span>
+              </button>
+            </div>
 
-    <div id="speechWarning" style="font-size:11px;color:#b45309;max-width:900px;margin:4px auto 0;display:none;">
-      La dictée vocale n’est pas prise en charge sur ce navigateur. Utilise de préférence Chrome ou Edge.
-    </div>
-  </section>
+            <div class="status-bar">
+              <div class="status-left">
+                <div class="status-dot"></div>
+                <span>Texte + navigation, tout dans la même fenêtre.</span>
+              </div>
+              <div class="status-right">
+                <span class="status-pill">
+                  <span class="status-pill-key">Ctrl</span> + <span class="status-pill-key">S</span>
+                  <span>Dupliquer le texte</span>
+                </span>
+              </div>
+            </div>
 
-  <!-- Vue RECHERCHE WEB -->
-  <section id="searchView" class="view">
-    <div class="search-bar">
-      <input id="searchQuery" type="text" placeholder="Rechercher sur le web (ex : révolution française, volcanisme…)" />
-      <button id="searchBtn" class="btn-primary">Rechercher</button>
-    </div>
-    <div class="search-info">
-      La recherche s’ouvre dans le cadre ci-dessous (Bing). Certains sites peuvent refuser l’affichage intégré.
-    </div>
-    <div class="search-result-frame">
-      <iframe id="searchFrame" title="Résultats de recherche"></iframe>
-    </div>
-  </section>
+            <div class="editor-container" id="editor-view">
+              <div class="toolbar">
+                <div class="toolbar-group">
+                  <button class="toolbar-button" data-command="bold">
+                    <span class="toolbar-button-icon">B</span>
+                    <span>Gras</span>
+                  </button>
+                  <button class="toolbar-button" data-command="italic">
+                    <span class="toolbar-button-icon">I</span>
+                    <span>Italique</span>
+                  </button>
+                  <button class="toolbar-button" data-command="underline">
+                    <span class="toolbar-button-icon">U</span>
+                    <span>Souligné</span>
+                  </button>
+                </div>
 
-  <!-- Vue ASSISTANT -->
-  <section id="assistantView" class="view">
-    <div class="assistant-container">
-      <div class="assistant-box">
-        <div class="assistant-header">
-          Assistant intégré (texte + audio, en français)
+                <div class="toolbar-group">
+                  <select class="toolbar-select" id="font-size-select">
+                    <option value="">Taille</option>
+                    <option value="3">Normal</option>
+                    <option value="4">+</option>
+                    <option value="5">++</option>
+                  </select>
+                  <div class="toolbar-divider"></div>
+                  <button class="toolbar-button" data-command="insertUnorderedList">
+                    <span class="toolbar-button-icon">•</span>
+                    <span>Liste</span>
+                  </button>
+                  <button class="toolbar-button" data-command="justifyLeft">
+                    <span class="toolbar-button-icon">≡</span>
+                    <span>Gauche</span>
+                  </button>
+                  <button class="toolbar-button" data-command="justifyCenter">
+                    <span class="toolbar-button-icon">≣</span>
+                    <span>Centre</span>
+                  </button>
+                </div>
+
+                <div class="toolbar-group">
+                  <button class="toolbar-button primary" id="copy-text">
+                    <span class="toolbar-button-icon">⧉</span>
+                    <span>Copier</span>
+                  </button>
+                </div>
+              </div>
+
+              <div class="editor" id="editor" contenteditable="true">
+                <div class="editor-content">
+                  <p>Bienvenue. Utilise l’onglet <strong>Web</strong> pour ouvrir des pages internet directement ici, sans changer d’onglet.</p>
+                  <p>Dans la barre en haut de l’onglet Web, tu peux saisir une <strong>URL</strong> (par exemple <em>https://fr.wikipedia.org</em>) ou simplement des <strong>mots-clés</strong> (par exemple <em>latex dungeon</em>) et la page s’affichera en dessous.</p>
+                </div>
+              </div>
+              <div class="hint">
+                <strong>Astuce :</strong> tu peux garder un texte ouvert à gauche et une page Web à droite pour écrire en parallèle.
+              </div>
+            </div>
+
+            <div class="web-container" id="web-view" style="display:none;">
+              <div class="web-search-bar">
+                <input
+                  type="text"
+                  id="web-input"
+                  class="web-search-input"
+                  placeholder="Tape une URL (https://...) ou une recherche (ex : latex dungeon)…"
+                />
+                <button class="web-button" id="web-go">
+                  <span>Ouvrir</span>
+                </button>
+              </div>
+              <div class="web-iframe-wrapper">
+                <iframe id="web-frame" class="web-iframe"></iframe>
+                <div class="web-placeholder" id="web-placeholder">
+                  <div class="web-placeholder-title">Aucune page chargée pour l’instant</div>
+                  <div>Entre une adresse ou une recherche dans la barre ci-dessus, puis appuie sur Entrée ou “Ouvrir”.</div>
+                  <div class="web-placeholder-badge">Tout s’ouvre directement ici</div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <div id="assistantMessages" class="assistant-messages"></div>
-
-        <div class="assistant-input-area">
-          <div class="assistant-input-row">
-            <textarea id="assistantInput" placeholder="Pose une question en français… (ex : Comment sauvegarder un document ?)"></textarea>
-          </div>
-          <div class="assistant-input-row">
-            <button id="assistantMicBtn" title="Dicter une question via le micro">
-              🎙️ Dicter la question
-            </button>
-            <button id="assistantSendBtn" class="btn-primary" title="Envoyer la question à l’assistant">
-              Envoyer
-            </button>
-            <button id="assistantStopVoiceBtn" title="Arrêter la lecture à voix haute">
-              🔇 Stop voix
-            </button>
-          </div>
-          <div class="assistant-info">
-            L’assistant répond avec des phrases simples et peut lire ses réponses à voix haute.
-            Il n’est pas connecté à Internet mais t’aide sur l’usage de la page.
+        <div class="right-pane">
+          <div class="pane-inner">
+            <div class="assistant-header">
+              <div class="assistant-title">
+                <span>Assistant de travail</span>
+              </div>
+            </div>
+            <div class="assistant-body">
+              <div class="assistant-messages" id="assistant-messages">
+                <div class="assistant-message assistant">
+                  Pose une question sur ton texte, demande une reformulation, ou note une idée rapide. Tout reste dans cette fenêtre.
+                </div>
+              </div>
+              <div class="assistant-input-row">
+                <input
+                  type="text"
+                  id="assistant-input"
+                  class="assistant-input"
+                  placeholder="Note, question, idée… (simulation d’assistant local)"
+                />
+                <button class="assistant-button" id="assistant-send">
+                  <span>Envoyer</span>
+                </button>
+              </div>
+              <div class="assistant-footer">
+                Réponses simulées pour l’instant (pas de connexion serveur).
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </section>
-</main>
+  </div>
 
-<script>
-  // ========= GESTION DES ONGLET =========
-  const tabs = document.querySelectorAll('.tab');
-  const views = document.querySelectorAll('.view');
+  <script>
+    const tabs = document.querySelectorAll(".tab");
+    const tabIndicator = document.getElementById("tab-indicator");
+    const editorView = document.getElementById("editor-view");
+    const webView = document.getElementById("web-view");
 
-  tabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-      const target = tab.getAttribute('data-tab');
-      tabs.forEach(t => t.classList.remove('active'));
-      views.forEach(v => v.classList.remove('active'));
-      tab.classList.add('active');
-      document.getElementById(target).classList.add('active');
-    });
-  });
-
-  // ========= ÉDITEUR =========
-  const editor = document.getElementById('editor');
-  const toolbarButtons = document.querySelectorAll('.toolbar button[data-cmd]');
-  const fontSizeSelect = document.getElementById('fontSizeSelect');
-  const colorInput = document.getElementById('colorInput');
-  const bgColorInput = document.getElementById('bgColorInput');
-  const wordCountSpan = document.getElementById('wordCount');
-
-  function updateWordCount() {
-    const text = editor.innerText || '';
-    const words = text.trim().split(/\s+/).filter(Boolean);
-    const chars = text.replace(/\s/g, '');
-    wordCountSpan.textContent = words.length + ' mot(s), ' + chars.length + ' caractère(s)';
-  }
-
-  editor.addEventListener('input', () => {
-    if (editor.textContent.trim() === '' && editor.innerHTML.trim() === '') {
-      editor.classList.add('empty');
-    } else {
-      editor.classList.remove('empty');
-    }
-    updateWordCount();
-    markDirty();
-  });
-
-  toolbarButtons.forEach(btn => {
-    btn.addEventListener('click', () => {
-      const cmd = btn.getAttribute('data-cmd');
-      const val = btn.getAttribute('data-value') || null;
-      document.execCommand(cmd, false, val);
-      editor.focus();
-    });
-  });
-
-  fontSizeSelect.addEventListener('change', () => {
-    const val = fontSizeSelect.value;
-    if (!val) return;
-    // On applique via un span stylé
-    applyStyleToSelection(style => {
-      style.fontSize = val;
-    });
-    editor.focus();
-  });
-
-  colorInput.addEventListener('change', () => {
-    const color = colorInput.value;
-    applyStyleToSelection(style => {
-      style.color = color;
-    });
-    editor.focus();
-  });
-
-  bgColorInput.addEventListener('change', () => {
-    const color = bgColorInput.value;
-    applyStyleToSelection(style => {
-      style.backgroundColor = color;
-    });
-    editor.focus();
-  });
-
-  function applyStyleToSelection(styleCallback) {
-    editor.focus();
-    const sel = window.getSelection();
-    if (!sel || sel.rangeCount === 0) return;
-    const range = sel.getRangeAt(0);
-
-    if (range.collapsed) {
-      const span = document.createElement('span');
-      styleCallback(span.style);
-      span.textContent = '\u200B';
-      range.insertNode(span);
-      range.setStart(span, 1);
-      range.collapse(true);
-      sel.removeAllRanges();
-      sel.addRange(range);
-      return;
+    function updateTabIndicator(activeIndex) {
+      if (!tabIndicator) return;
+      const percentage = activeIndex * 100;
+      tabIndicator.style.transform = "translateX(" + percentage + "%)";
     }
 
-    const selectedContent = range.extractContents();
-    const span = document.createElement('span');
-    styleCallback(span.style);
-    span.appendChild(selectedContent);
-    range.insertNode(span);
-    sel.removeAllRanges();
-    const newRange = document.createRange();
-    newRange.selectNodeContents(span);
-    sel.addRange(newRange);
-  }
-
-  // ========= INSERT IMAGE & TABLE =========
-  const insertImageBtn = document.getElementById('insertImageBtn');
-  const insertTableBtn = document.getElementById('insertTableBtn');
-
-  insertImageBtn.addEventListener('click', () => {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*';
-    input.onchange = () => {
-      const file = input.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = e => {
-        const img = document.createElement('img');
-        img.src = e.target.result;
-        img.style.maxWidth = '100%';
-        img.style.display = 'block';
-        img.style.margin = '8px 0';
-        insertNodeAtCursor(img);
-      };
-      reader.readAsDataURL(file);
-    };
-    input.click();
-  });
-
-  insertTableBtn.addEventListener('click', () => {
-    const rows = parseInt(prompt('Nombre de lignes ?', '2'), 10);
-    const cols = parseInt(prompt('Nombre de colonnes ?', '2'), 10);
-    if (!rows || !cols || rows < 1 || cols < 1) return;
-    const table = document.createElement('table');
-    table.style.borderCollapse = 'collapse';
-    table.style.margin = '8px 0';
-    table.style.width = '100%';
-
-    for (let r = 0; r < rows; r++) {
-      const tr = document.createElement('tr');
-      for (let c = 0; c < cols; c++) {
-        const td = document.createElement('td');
-        td.style.border = '1px solid #000';
-        td.style.padding = '4px';
-        td.innerHTML = '&nbsp;';
-        tr.appendChild(td);
-      }
-      table.appendChild(tr);
-    }
-    insertNodeAtCursor(table);
-  });
-
-  function insertNodeAtCursor(node) {
-    editor.focus();
-    const sel = window.getSelection();
-    if (!sel || sel.rangeCount === 0) {
-      editor.appendChild(node);
-      return;
-    }
-    const range = sel.getRangeAt(0);
-    range.collapse(false);
-    range.insertNode(node);
-    range.setStartAfter(node);
-    range.collapse(true);
-    sel.removeAllRanges();
-    sel.addRange(range);
-  }
-
-  // ========= DICTÉE VOCALE DOCUMENT =========
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  const startMicBtn = document.getElementById('startMicBtn');
-  const stopMicBtn = document.getElementById('stopMicBtn');
-  const micDot = document.getElementById('micDot');
-  const micStatusText = document.getElementById('micStatusText');
-  const speechWarning = document.getElementById('speechWarning');
-
-  let recognition = null;
-  let isListening = false;
-
-  if (!SpeechRecognition) {
-    speechWarning.style.display = 'block';
-    startMicBtn.disabled = true;
-    stopMicBtn.disabled = true;
-  } else {
-    recognition = new SpeechRecognition();
-    recognition.lang = 'fr-FR';
-    recognition.continuous = true;
-    recognition.interimResults = true;
-
-    let interimSpan = null;
-
-    function insertTextAtCursor(text) {
-      editor.focus();
-      const sel = window.getSelection();
-      if (!sel || sel.rangeCount === 0) {
-        editor.appendChild(document.createTextNode(text));
-        return;
-      }
-      const range = sel.getRangeAt(0);
-      range.deleteContents();
-      range.insertNode(document.createTextNode(text));
-      range.collapse(false);
-      sel.removeAllRanges();
-      sel.addRange(range);
-    }
-
-    recognition.onstart = () => {
-      isListening = true;
-      micDot.classList.add('active');
-      micStatusText.textContent = 'Dictée du document en cours. Parle près du micro.';
-      editor.classList.remove('empty');
-      if (!interimSpan) {
-        interimSpan = document.createElement('span');
-        interimSpan.style.opacity = '0.6';
-        interimSpan.style.fontStyle = 'italic';
-        editor.appendChild(interimSpan);
-      }
-    };
-
-    recognition.onend = () => {
-      isListening = false;
-      micDot.classList.remove('active');
-      micStatusText.textContent = 'Dictée du document arrêtée.';
-      if (interimSpan) {
-        interimSpan.remove();
-        interimSpan = null;
-      }
-    };
-
-    recognition.onerror = (event) => {
-      micStatusText.textContent = 'Erreur dictée doc : ' + event.error;
-      console.error('Erreur dictée document :', event.error);
-    };
-
-    recognition.onresult = (event) => {
-      let finalText = '';
-      let interimText = '';
-
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        const transcript = event.results[i][0].transcript;
-        if (event.results[i].isFinal) {
-          finalText += transcript + ' ';
+    tabs.forEach((tab, index) => {
+      tab.addEventListener("click", () => {
+        tabs.forEach((t) => t.classList.remove("active"));
+        tab.classList.add("active");
+        updateTabIndicator(index);
+        const target = tab.getAttribute("data-tab");
+        if (target === "editor") {
+          editorView.style.display = "";
+          webView.style.display = "none";
         } else {
-          interimText += transcript;
+          editorView.style.display = "none";
+          webView.style.display = "";
         }
-      }
+      });
+    });
 
-      if (finalText) {
-        if (interimSpan) {
-          interimSpan.remove();
-          interimSpan = null;
-        }
-        insertTextAtCursor(finalText);
-        if (!interimSpan) {
-          interimSpan = document.createElement('span');
-          interimSpan.style.opacity = '0.6';
-          interimSpan.style.fontStyle = 'italic';
-          editor.appendChild(interimSpan);
-        }
-      }
+    updateTabIndicator(0);
 
-      if (interimSpan) {
-        interimSpan.textContent = interimText;
-      }
-    };
+    const toolbarButtons = document.querySelectorAll(".toolbar-button[data-command]");
+    const editor = document.getElementById("editor");
+    const fontSizeSelect = document.getElementById("font-size-select");
 
-    startMicBtn.addEventListener('click', () => {
-      if (!recognition) return;
-      if (!isListening) {
-        try {
-          recognition.start();
-        } catch (e) {
-          console.warn('Dictée déjà en cours.');
-        }
+    toolbarButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        const command = button.getAttribute("data-command");
+        document.execCommand(command, false, null);
+        editor.focus();
+      });
+    });
+
+    fontSizeSelect.addEventListener("change", () => {
+      const size = fontSizeSelect.value;
+      if (size) {
+        document.execCommand("fontSize", false, size);
+        editor.focus();
       }
     });
 
-    stopMicBtn.addEventListener('click', () => {
-      if (!recognition) return;
-      if (isListening) {
-        recognition.stop();
+    const copyButton = document.getElementById("copy-text");
+    copyButton.addEventListener("click", () => {
+      const selection = window.getSelection();
+      const range = document.createRange();
+      range.selectNodeContents(editor);
+      selection.removeAllRanges();
+      selection.addRange(range);
+      try {
+        document.execCommand("copy");
+        selection.removeAllRanges();
+        copyButton.querySelector("span:nth-child(2)").textContent = "Copié !";
+        setTimeout(() => {
+          copyButton.querySelector("span:nth-child(2)").textContent = "Copier";
+        }, 1000);
+      } catch (err) {}
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s") {
+        e.preventDefault();
+        copyButton.click();
       }
     });
-  }
 
-  // ========= SAUVEGARDE LOCALE =========
-  const STORAGE_KEY = 'docsAssistant_v1';
-  const docNameInput = document.getElementById('docName');
-  const newDocBtn = document.getElementById('newDocBtn');
-  const saveDocBtn = document.getElementById('saveDocBtn');
-  const docListSelect = document.getElementById('docList');
-  const deleteDocBtn = document.getElementById('deleteDocBtn');
-  const storageStatus = document.getElementById('storageStatus');
+    const webInput = document.getElementById("web-input");
+    const webGo = document.getElementById("web-go");
+    const webFrame = document.getElementById("web-frame");
+    const webPlaceholder = document.getElementById("web-placeholder");
 
-  function loadDocs() {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : {};
-  }
+    function buildUrlFromInput(value) {
+      const trimmed = value.trim();
+      if (!trimmed) return null;
 
-  function saveDocs(docs) {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(docs));
-  }
+      const hasSpace = /\s/.test(trimmed);
+      const looksLikeUrl =
+        /^https?:\/\//i.test(trimmed) ||
+        /^[a-z0-9.-]+\.[a-z]{2,}(\/.*)?$/i.test(trimmed);
 
-  function refreshDocList() {
-    const docs = loadDocs();
-    docListSelect.innerHTML = '<option value="">Documents enregistrés…</option>';
-    Object.keys(docs).forEach(name => {
-      const opt = document.createElement('option');
-      opt.value = name;
-      opt.textContent = name;
-      docListSelect.appendChild(opt);
-    });
-    storageStatus.textContent = Object.keys(docs).length + ' document(s) stocké(s) dans ce navigateur';
-  }
-
-  refreshDocList();
-
-  newDocBtn.addEventListener('click', () => {
-    editor.innerHTML = '';
-    editor.classList.add('empty');
-    docNameInput.value = '';
-    docListSelect.value = '';
-    storageStatus.textContent = 'Nouveau document créé.';
-    dirty = false;
-  });
-
-  saveDocBtn.addEventListener('click', () => {
-    const name = docNameInput.value.trim();
-    if (!name) {
-      alert('Donne un nom au document avant de sauvegarder.');
-      return;
-    }
-    const docs = loadDocs();
-    docs[name] = editor.innerHTML;
-    saveDocs(docs);
-    refreshDocList();
-    storageStatus.textContent = 'Document "' + name + '" sauvegardé dans ce navigateur.';
-    dirty = false;
-  });
-
-  docListSelect.addEventListener('change', () => {
-    const name = docListSelect.value;
-    if (!name) return;
-    const docs = loadDocs();
-    editor.innerHTML = docs[name] || '';
-    editor.dispatchEvent(new Event('input'));
-    docNameInput.value = name;
-    storageStatus.textContent = 'Document "' + name + '" chargé.';
-    dirty = false;
-  });
-
-  deleteDocBtn.addEventListener('click', () => {
-    const name = docListSelect.value;
-    if (!name) {
-      alert('Choisis un document à supprimer.');
-      return;
-    }
-    if (!confirm('Supprimer le document "' + name + '" ?')) return;
-    const docs = loadDocs();
-    delete docs[name];
-    saveDocs(docs);
-    refreshDocList();
-    if (docNameInput.value === name) {
-      editor.innerHTML = '';
-      editor.classList.add('empty');
-      docNameInput.value = '';
-    }
-    storageStatus.textContent = 'Document "' + name + '" supprimé.';
-  });
-
-  let dirty = false;
-  function markDirty() {
-    dirty = true;
-  }
-
-  setInterval(() => {
-    if (!dirty) return;
-    const name = docNameInput.value.trim();
-    if (!name) return;
-    const docs = loadDocs();
-    docs[name] = editor.innerHTML;
-    saveDocs(docs);
-    storageStatus.textContent = 'Auto-sauvegarde du document "' + name + '".';
-    dirty = false;
-  }, 10000);
-
-  // ========= EXPORT =========
-  const exportFormatSelect = document.getElementById('exportFormat');
-  const downloadBtn = document.getElementById('downloadBtn');
-
-  function wrapHTML(content) {
-    return '<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body>' +
-      content +
-      '</body></html>';
-  }
-
-  downloadBtn.addEventListener('click', () => {
-    const name = docNameInput.value.trim() || 'document';
-    const format = exportFormatSelect.value;
-    const content = editor.innerHTML;
-
-    if (format === 'html') {
-      const html = wrapHTML(content);
-      const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = name + '.html';
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
-    } else if (format === 'doc') {
-      const html = wrapHTML(content);
-      const blob = new Blob([html], { type: 'application/msword;charset=utf-8' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = name + '.doc';
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
-    } else if (format === 'pdf') {
-      const html = wrapHTML(content);
-      const win = window.open('', '_blank');
-      if (!win) {
-        alert('Le navigateur a bloqué la fenêtre d’impression. Autorise les pop-ups.');
-        return;
-      }
-      win.document.open();
-      win.document.write(html);
-      win.document.close();
-      win.focus();
-      win.print();
-    }
-  });
-
-  // ========= OUVERTURE DE FICHIERS =========
-  const openFileBtn = document.getElementById('openFileBtn');
-  const fileInput = document.getElementById('fileInput');
-
-  openFileBtn.addEventListener('click', () => fileInput.click());
-
-  fileInput.addEventListener('change', () => {
-    const file = fileInput.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = e => {
-      const text = e.target.result;
-      const name = file.name.toLowerCase();
-
-      if (name.endsWith('.html') || name.endsWith('.htm') || name.endsWith('.doc')) {
-        editor.innerHTML = text;
-      } else if (name.endsWith('.txt')) {
-        editor.innerHTML = text
-          .replace(/&/g, '&amp;')
-          .replace(/</g, '&lt;')
-          .replace(/>/g, '&gt;')
-          .replace(/\n/g, '<br>');
-      } else {
-        alert('Format non supporté. Utilise .html, .htm, .txt ou .doc généré par ce site.');
-        return;
-      }
-
-      editor.dispatchEvent(new Event('input'));
-      docNameInput.value = file.name.replace(/\.(html?|txt|doc)$/i, '');
-      storageStatus.textContent = 'Fichier "' + file.name + '" ouvert.';
-      fileInput.value = '';
-      dirty = true;
-    };
-    reader.readAsText(file);
-  });
-
-  // ========= RECHERCHE WEB =========
-  const searchQueryInput = document.getElementById('searchQuery');
-  const searchBtn = document.getElementById('searchBtn');
-  const searchFrame = document.getElementById('searchFrame');
-
-  function performSearch() {
-    const q = searchQueryInput.value.trim();
-    if (!q) return;
-    const url = 'https://www.bing.com/search?q=' + encodeURIComponent(q);
-    searchFrame.src = url;
-  }
-
-  searchBtn.addEventListener('click', performSearch);
-
-  searchQueryInput.addEventListener('keydown', e => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      performSearch();
-    }
-  });
-
-  // ========= ASSISTANT (texte + audio) =========
-  const assistantMessages = document.getElementById('assistantMessages');
-  const assistantInput = document.getElementById('assistantInput');
-  const assistantSendBtn = document.getElementById('assistantSendBtn');
-  const assistantMicBtn = document.getElementById('assistantMicBtn');
-  const assistantStopVoiceBtn = document.getElementById('assistantStopVoiceBtn');
-
-  function addAssistantMessage(text, from) {
-    const div = document.createElement('div');
-    div.classList.add('assistant-message', from);
-    div.textContent = text;
-    assistantMessages.appendChild(div);
-    assistantMessages.scrollTop = assistantMessages.scrollHeight;
-  }
-
-  function generateAssistantResponse(question) {
-    const q = question.toLowerCase();
-
-    if (!q.trim()) {
-      return 'Tu peux me poser une question sur l’éditeur, la dictée vocale, la sauvegarde ou le téléchargement.';
-    }
-
-    if (q.includes('bonjour') || q.includes('salut') || q.includes('bonsoir')) {
-      return 'Bonjour ! Je suis un assistant simple intégré à cette page. Comment puis-je t’aider ?';
-    }
-
-    if (q.includes('qui es-tu') || q.includes('tu es qui')) {
-      return 'Je suis un assistant intégré dans ce site. Je ne suis pas connecté à Internet, mais je peux t’expliquer comment utiliser cet outil.';
-    }
-
-    if (q.includes('sauvegarder') || q.includes('enregistrer')) {
-      return 'Pour sauvegarder ton document, donne-lui un nom en haut, puis clique sur "Sauvegarder". Le document est stocké uniquement dans ton navigateur.';
-    }
-
-    if (q.includes('télécharger') || q.includes('word') || q.includes('pdf') || q.includes('html')) {
-      return 'Tu peux choisir le format (Word, HTML ou PDF) dans la liste, puis cliquer sur "Télécharger" pour exporter ton texte.';
-    }
-
-    if (q.includes('dictée') || q.includes('micro') || q.includes('parler')) {
-      return 'Pour utiliser la dictée vocale dans le document, clique sur "Dictée document", autorise le micro, puis parle près du micro. Clique sur "Stop dictée" pour arrêter.';
-    }
-
-    if (q.includes('recherche') || q.includes('web') || q.includes('internet')) {
-      return 'Onglet "Recherche web" : tu tapes ce que tu cherches, puis tu cliques sur "Rechercher". Les résultats s’ouvrent dans le cadre intégré.';
-    }
-
-    return 'Je ne suis pas un assistant très avancé, mais j’ai bien compris ta question : "' +
-      question.trim() +
-      '". Si tu veux, reformule ou précise ce que tu aimerais que j’explique.';
-  }
-
-  function speak(text) {
-    if (!('speechSynthesis' in window)) return;
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'fr-FR';
-    window.speechSynthesis.speak(utterance);
-  }
-
-  assistantSendBtn.addEventListener('click', () => {
-    const text = assistantInput.value.trim();
-    if (!text) return;
-    addAssistantMessage(text, 'user');
-    assistantInput.value = '';
-    const response = generateAssistantResponse(text);
-    addAssistantMessage(response, 'bot');
-    speak(response);
-  });
-
-  assistantInput.addEventListener('keydown', e => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      assistantSendBtn.click();
-    }
-  });
-
-  assistantStopVoiceBtn.addEventListener('click', () => {
-    if ('speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
-    }
-  });
-
-  // Assistant vocal (question dictée)
-  let assistantRecognition = null;
-  let assistantListening = false;
-
-  if (SpeechRecognition) {
-    assistantRecognition = new SpeechRecognition();
-    assistantRecognition.lang = 'fr-FR';
-    assistantRecognition.continuous = false;
-    assistantRecognition.interimResults = false;
-
-    assistantRecognition.onstart = () => {
-      assistantListening = true;
-      addAssistantMessage('Je t’écoute, dicte ta question.', 'bot');
-    };
-
-    assistantRecognition.onend = () => {
-      assistantListening = false;
-    };
-
-    assistantRecognition.onerror = event => {
-      addAssistantMessage('Problème avec le micro de l’assistant : ' + event.error, 'bot');
-      console.error('Erreur assistant vocal :', event.error);
-    };
-
-    assistantRecognition.onresult = event => {
-      const transcript = event.results[0][0].transcript;
-      addAssistantMessage(transcript, 'user');
-      const response = generateAssistantResponse(transcript);
-      addAssistantMessage(response, 'bot');
-      speak(response);
-    };
-
-    assistantMicBtn.addEventListener('click', () => {
-      if (!assistantRecognition) return;
-      if (!assistantListening) {
-        try {
-          assistantRecognition.start();
-        } catch (e) {
-          console.warn('Assistant vocal déjà en cours.');
+      if (looksLikeUrl) {
+        if (!/^https?:\/\//i.test(trimmed)) {
+          return "https://" + trimmed;
         }
+        return trimmed;
+      }
+
+      const encoded = encodeURIComponent(trimmed);
+      return "https://duckduckgo.com/?q=" + encoded + "&ia=web";
+    }
+
+    function openInWebFrame() {
+      const value = webInput.value;
+      const url = buildUrlFromInput(value);
+      if (!url) return;
+      webFrame.src = url;
+      if (webPlaceholder) {
+        webPlaceholder.style.display = "none";
+      }
+    }
+
+    webGo.addEventListener("click", openInWebFrame);
+
+    webInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        openInWebFrame();
       }
     });
-  } else {
-    assistantMicBtn.disabled = true;
-    addAssistantMessage(
-      'Ton navigateur ne supporte pas la dictée vocale pour l’assistant, mais tu peux écrire tes questions au clavier.',
-      'bot'
-    );
-  }
 
-  // Message de bienvenue de l’assistant
-  addAssistantMessage(
-    'Bonjour ! Je suis un assistant simple intégré à cette page. Je peux t’aider à utiliser l’éditeur, la dictée vocale, la sauvegarde, le téléchargement et la recherche web. Pose-moi une question en français.',
-    'bot'
-  );
-</script>
+    const assistantInput = document.getElementById("assistant-input");
+    const assistantSend = document.getElementById("assistant-send");
+    const assistantMessages = document.getElementById("assistant-messages");
+
+    function addAssistantMessage(text, role) {
+      const div = document.createElement("div");
+      div.className = "assistant-message " + role;
+      div.textContent = text;
+      assistantMessages.appendChild(div);
+      assistantMessages.scrollTop = assistantMessages.scrollHeight;
+    }
+
+    assistantSend.addEventListener("click", () => {
+      const text = assistantInput.value.trim();
+      if (!text) return;
+      addAssistantMessage(text, "user");
+      assistantInput.value = "";
+      setTimeout(() => {
+        addAssistantMessage(
+          "Réponse simulée : je note — à relier à un véritable assistant plus tard.",
+          "assistant"
+        );
+      }, 400);
+    });
+
+    assistantInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        assistantSend.click();
+      }
+    });
+  </script>
 </body>
 </html>
