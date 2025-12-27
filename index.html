@@ -2,28 +2,35 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <title>Mini Word du navigateur</title>
+  <title>Word du navigateur</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     * { box-sizing: border-box; }
 
-    body {
+    html, body {
       margin: 0;
+      padding: 0;
+      height: 100%;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background: radial-gradient(circle at top, #1e293b, #020617);
       color: #e5e7eb;
-      min-height: 100vh;
+    }
+
+    body {
       display: flex;
       flex-direction: column;
+      overflow: hidden;
     }
 
     header {
-      padding: 10px 16px;
+      padding: 8px 10px;
       background: rgba(15, 23, 42, 0.98);
       border-bottom: 1px solid #1f2937;
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
+      z-index: 10;
     }
 
     header h1 {
@@ -35,7 +42,7 @@
     .header-right {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
+      gap: 6px;
       align-items: center;
       margin-left: auto;
     }
@@ -46,7 +53,8 @@
       border: 1px solid #4b5563;
       background: #020617;
       color: #e5e7eb;
-      min-width: 160px;
+      min-width: 120px;
+      max-width: 180px;
     }
 
     select {
@@ -55,27 +63,28 @@
       border: 1px solid #4b5563;
       background: #020617;
       color: #e5e7eb;
-      min-width: 150px;
+      max-width: 170px;
     }
 
     button {
       border: none;
       border-radius: 999px;
-      padding: 6px 12px;
-      font-size: 14px;
+      padding: 6px 10px;
+      font-size: 13px;
       cursor: pointer;
       font-weight: 500;
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 4px;
       transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.2s ease;
       background: #1f2937;
       color: #e5e7eb;
+      white-space: nowrap;
     }
 
     button:hover {
       transform: translateY(-1px);
-      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.4);
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.4);
       background: #111827;
     }
 
@@ -100,61 +109,70 @@
       flex: 1;
       display: flex;
       flex-direction: column;
-      padding: 12px 16px 16px;
-      gap: 8px;
+      padding: 6px 10px 10px;
+      gap: 6px;
+      overflow: hidden;
     }
 
     .toolbar {
       background: rgba(15, 23, 42, 0.9);
-      border-radius: 999px;
+      border-radius: 12px;
       border: 1px solid #1f2937;
-      padding: 4px 8px;
+      padding: 4px 6px;
       display: flex;
       flex-wrap: wrap;
       gap: 4px;
       align-items: center;
+      max-height: 96px;
+      overflow-x: auto;
     }
 
     .toolbar button {
       border-radius: 8px;
-      padding: 4px 8px;
-      font-size: 13px;
+      padding: 3px 8px;
+      font-size: 12px;
+    }
+
+    .toolbar select {
+      border-radius: 8px;
+      font-size: 12px;
+      padding: 3px 6px;
     }
 
     .toolbar-divider {
       width: 1px;
       height: 24px;
       background: #334155;
-      margin: 0 4px;
+      margin: 0 3px;
     }
 
-    .editor-container {
+    .editor-wrapper {
       flex: 1;
-      margin-top: 8px;
       display: flex;
       flex-direction: column;
       align-items: center;
-      overflow: auto;
+      overflow: hidden;
+      padding-top: 4px;
     }
 
     .page {
       width: 100%;
-      max-width: 900px;
-      min-height: 600px;
+      max-width: 1000px;
+      height: 100%;
+      max-height: calc(100vh - 160px);
       background: #ffffff;
       color: #000000;
-      border-radius: 8px;
-      margin-top: 8px;
-      padding: 32px 40px;
+      border-radius: 6px;
+      padding: 20px 24px;
       box-shadow:
-        0 20px 40px rgba(15, 23, 42, 0.6),
+        0 18px 32px rgba(15, 23, 42, 0.6),
         0 0 0 1px rgba(148, 163, 184, 0.15);
       overflow: auto;
     }
 
     #editor {
       outline: none;
-      min-height: 500px;
+      min-height: 100%;
       white-space: pre-wrap;
     }
 
@@ -164,13 +182,13 @@
     }
 
     .status-bar {
-      margin-top: 8px;
+      margin-top: 4px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 12px;
+      font-size: 11px;
       color: #9ca3af;
-      max-width: 900px;
+      max-width: 1000px;
       width: 100%;
     }
 
@@ -202,29 +220,39 @@
 
     .warning {
       color: #f97316;
-      font-size: 12px;
-      margin-top: 4px;
-      max-width: 900px;
+      font-size: 11px;
+      margin-top: 2px;
+      max-width: 1000px;
       width: 100%;
     }
 
-    @media (max-width: 900px) {
+    @media (max-width: 768px) {
       header {
         flex-direction: column;
         align-items: flex-start;
       }
       .header-right {
         margin-left: 0;
+        width: 100%;
+        justify-content: flex-start;
+      }
+      input[type="text"], select {
+        max-width: 130px;
+        font-size: 12px;
+      }
+      button {
+        font-size: 12px;
       }
       .page {
-        padding: 20px;
+        max-height: calc(100vh - 210px);
+        padding: 12px 12px;
       }
     }
   </style>
 </head>
 <body>
 <header>
-  <h1>Mini Word du navigateur</h1>
+  <h1>Word du navigateur</h1>
   <div class="header-right">
     <input id="docName" type="text" placeholder="Nom du document" />
     <button id="newDocBtn">Nouveau</button>
@@ -233,42 +261,83 @@
     <select id="docList">
       <option value="">Docs enregistrés…</option>
     </select>
-    <button id="deleteDocBtn" class="btn-danger">🗑️ Supprimer</button>
+    <button id="deleteDocBtn" class="btn-danger">🗑️</button>
 
     <select id="exportFormat">
       <option value="doc">Word (.doc)</option>
       <option value="html">HTML (.html)</option>
       <option value="pdf">PDF (.pdf)</option>
     </select>
-    <button id="downloadBtn">⬇️ Télécharger</button>
+    <button id="downloadBtn">⬇️</button>
 
-    <button id="openFileBtn">📂 Ouvrir fichier…</button>
+    <button id="openFileBtn">📂 Ouvrir</button>
     <input id="fileInput" type="file" accept=".html,.htm,.txt,.doc" style="display:none" />
   </div>
 </header>
 
 <main>
   <div class="toolbar">
-    <button data-cmd="bold"><b>Gras</b></button>
-    <button data-cmd="italic"><i>Italique</i></button>
-    <button data-cmd="underline"><u>Souligné</u></button>
+    <!-- police & taille -->
+    <select id="fontFamilySelect">
+      <option value="">Police</option>
+      <option value="Arial">Arial</option>
+      <option value="Georgia">Georgia</option>
+      <option value="Times New Roman">Times</option>
+      <option value="Verdana">Verdana</option>
+    </select>
+    <select id="fontSizeSelect">
+      <option value="">Taille</option>
+      <option value="2">Petit</option>
+      <option value="3">Normal</option>
+      <option value="4">Grand</option>
+      <option value="5">Très grand</option>
+      <option value="6">Titre</option>
+    </select>
     <div class="toolbar-divider"></div>
-    <button data-cmd="formatBlock" data-value="h1">Titre 1</button>
-    <button data-cmd="formatBlock" data-value="h2">Titre 2</button>
-    <button data-cmd="formatBlock" data-value="p">Paragraphe</button>
+
+    <button data-cmd="bold"><b>G</b></button>
+    <button data-cmd="italic"><i>I</i></button>
+    <button data-cmd="underline"><u>S</u></button>
+    <button data-cmd="removeFormat">✖ style</button>
     <div class="toolbar-divider"></div>
+
+    <button data-cmd="formatBlock" data-value="h1">H1</button>
+    <button data-cmd="formatBlock" data-value="h2">H2</button>
+    <button data-cmd="formatBlock" data-value="p">Parag</button>
+    <div class="toolbar-divider"></div>
+
     <button data-cmd="insertUnorderedList">• Liste</button>
     <button data-cmd="insertOrderedList">1. Liste</button>
+    <button data-cmd="outdent">↤</button>
+    <button data-cmd="indent">↦</button>
     <div class="toolbar-divider"></div>
-    <button data-cmd="justifyLeft">↤ Gauche</button>
-    <button data-cmd="justifyCenter">≡ Centre</button>
-    <button data-cmd="justifyRight">↦ Droite</button>
+
+    <button data-cmd="justifyLeft">⟸</button>
+    <button data-cmd="justifyCenter">≡</button>
+    <button data-cmd="justifyRight">⟹</button>
     <div class="toolbar-divider"></div>
-    <button id="startMicBtn" class="btn-primary">🎙️ Démarrer dictée</button>
-    <button id="stopMicBtn" class="btn-danger">⏹️ Stop dictée</button>
+
+    <label style="font-size:11px;">T
+      <input id="colorInput" type="color" style="width:24px;height:20px;border:none;padding:0;margin-left:2px;">
+    </label>
+    <label style="font-size:11px;">Sur
+      <input id="bgColorInput" type="color" style="width:24px;height:20px;border:none;padding:0;margin-left:2px;">
+    </label>
+    <div class="toolbar-divider"></div>
+
+    <button id="insertImageBtn">🖼️ Image</button>
+    <button id="insertTableBtn">▦ Tableau</button>
+    <div class="toolbar-divider"></div>
+
+    <button data-cmd="undo">↺</button>
+    <button data-cmd="redo">↻</button>
+    <div class="toolbar-divider"></div>
+
+    <button id="startMicBtn" class="btn-primary">🎙️</button>
+    <button id="stopMicBtn" class="btn-danger">⏹️</button>
   </div>
 
-  <div class="editor-container">
+  <div class="editor-wrapper">
     <div class="page">
       <div id="editor" contenteditable="true" class="empty"></div>
     </div>
@@ -277,10 +346,11 @@
         <span class="dot" id="micDot"></span>
         <span id="micStatusText"></span>
       </div>
+      <div id="wordCount"></div>
       <div id="storageStatus"></div>
     </div>
     <div class="warning" id="speechWarning" style="display:none;">
-      L’API de reconnaissance vocale n’est pas supportée sur ce navigateur. Utilise de préférence Chrome ou Edge.
+      Dictée vocale non supportée sur ce navigateur. Utilise de préférence Chrome ou Edge.
     </div>
   </div>
 </main>
@@ -289,6 +359,11 @@
   // ---------- ÉDITEUR ----------
   const editor = document.getElementById('editor');
   const toolbarButtons = document.querySelectorAll('.toolbar button[data-cmd]');
+  const fontFamilySelect = document.getElementById('fontFamilySelect');
+  const fontSizeSelect = document.getElementById('fontSizeSelect');
+  const colorInput = document.getElementById('colorInput');
+  const bgColorInput = document.getElementById('bgColorInput');
+  const wordCount = document.getElementById('wordCount');
 
   editor.addEventListener('input', () => {
     if (editor.textContent.trim().length === 0 && editor.innerHTML.trim() === '') {
@@ -296,7 +371,16 @@
     } else {
       editor.classList.remove('empty');
     }
+    updateWordCount();
+    markDirty();
   });
+
+  function updateWordCount() {
+    const text = editor.innerText || "";
+    const words = text.trim().split(/\s+/).filter(Boolean);
+    const chars = text.replace(/\s/g, '');
+    wordCount.textContent = words.length + " mot(s), " + chars.length + " caractère(s)";
+  }
 
   toolbarButtons.forEach(btn => {
     btn.addEventListener('click', () => {
@@ -307,8 +391,93 @@
     });
   });
 
+  fontFamilySelect.addEventListener('change', () => {
+    const val = fontFamilySelect.value;
+    if (val) document.execCommand('fontName', false, val);
+    editor.focus();
+  });
+
+  fontSizeSelect.addEventListener('change', () => {
+    const val = fontSizeSelect.value;
+    if (val) document.execCommand('fontSize', false, val);
+    editor.focus();
+  });
+
+  colorInput.addEventListener('change', () => {
+    document.execCommand('foreColor', false, colorInput.value);
+    editor.focus();
+  });
+
+  bgColorInput.addEventListener('change', () => {
+    document.execCommand('hiliteColor', false, bgColorInput.value);
+    editor.focus();
+  });
+
+  // ---------- INSERT IMAGE & TABLE ----------
+  const insertImageBtn = document.getElementById('insertImageBtn');
+  const insertTableBtn = document.getElementById('insertTableBtn');
+
+  insertImageBtn.addEventListener('click', () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = () => {
+      const file = input.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        const img = document.createElement('img');
+        img.src = e.target.result;
+        img.style.maxWidth = '100%';
+        img.style.display = 'block';
+        img.style.margin = '8px 0';
+        insertNodeAtCursor(img);
+      };
+      reader.readAsDataURL(file);
+    };
+    input.click();
+  });
+
+  insertTableBtn.addEventListener('click', () => {
+    const rows = parseInt(prompt("Nombre de lignes ?", "2"), 10);
+    const cols = parseInt(prompt("Nombre de colonnes ?", "2"), 10);
+    if (!rows || !cols || rows < 1 || cols < 1) return;
+    const table = document.createElement('table');
+    table.style.borderCollapse = 'collapse';
+    table.style.margin = '8px 0';
+    table.style.width = '100%';
+    for (let r = 0; r < rows; r++) {
+      const tr = document.createElement('tr');
+      for (let c = 0; c < cols; c++) {
+        const td = document.createElement('td');
+        td.style.border = '1px solid #000';
+        td.style.padding = '4px';
+        td.innerHTML = '&nbsp;';
+        tr.appendChild(td);
+      }
+      table.appendChild(tr);
+    }
+    insertNodeAtCursor(table);
+  });
+
+  function insertNodeAtCursor(node) {
+    editor.focus();
+    const sel = window.getSelection();
+    if (!sel || sel.rangeCount === 0) {
+      editor.appendChild(node);
+      return;
+    }
+    const range = sel.getRangeAt(0);
+    range.collapse(false);
+    range.insertNode(node);
+    range.setStartAfter(node);
+    range.collapse(true);
+    sel.removeAllRanges();
+    sel.addRange(range);
+  }
+
   // ---------- DOCUMENTS (localStorage) ----------
-  const STORAGE_KEY = 'miniWordDocs_v1';
+  const STORAGE_KEY = 'wordNavDocs_v1';
   const docNameInput = document.getElementById('docName');
   const newDocBtn = document.getElementById('newDocBtn');
   const saveDocBtn = document.getElementById('saveDocBtn');
@@ -339,7 +508,7 @@
     if (currentValue && docs[currentValue]) {
       docListSelect.value = currentValue;
     }
-    storageStatus.textContent = Object.keys(docs).length + ' document(s) stocké(s) dans ce navigateur';
+    storageStatus.textContent = Object.keys(docs).length + ' doc(s) dans ce navigateur';
   }
 
   function newDocument() {
@@ -348,6 +517,7 @@
     docNameInput.value = '';
     docListSelect.value = '';
     storageStatus.textContent = 'Nouveau document.';
+    dirty = false;
   }
 
   function saveCurrentDocument() {
@@ -362,7 +532,8 @@
       updatedAt: new Date().toISOString()
     };
     saveDocs(docs);
-    storageStatus.textContent = 'Document "' + name + '" sauvegardé dans le navigateur.';
+    storageStatus.textContent = 'Document "' + name + '" sauvegardé.';
+    dirty = false;
   }
 
   function loadSelectedDocument() {
@@ -374,7 +545,8 @@
     editor.innerHTML = doc.content || '';
     editor.dispatchEvent(new Event('input'));
     docNameInput.value = name;
-    storageStatus.textContent = 'Document "' + name + '" chargé depuis le navigateur.';
+    storageStatus.textContent = 'Document "' + name + '" chargé.';
+    dirty = false;
   }
 
   function deleteSelectedDocument() {
@@ -399,8 +571,26 @@
   deleteDocBtn.addEventListener('click', deleteSelectedDocument);
 
   updateDocList();
+  updateWordCount();
 
-  // ---------- EXPORT (Word / HTML / PDF) ----------
+  // ---------- AUTOSAVE ----------
+  let dirty = false;
+  function markDirty() { dirty = true; }
+  setInterval(() => {
+    if (!dirty) return;
+    const name = docNameInput.value.trim();
+    if (!name) return;
+    const docs = loadDocs();
+    docs[name] = {
+      content: editor.innerHTML,
+      updatedAt: new Date().toISOString()
+    };
+    saveDocs(docs);
+    storageStatus.textContent = 'Auto-sauvegarde de "' + name + '".';
+    dirty = false;
+  }, 10000);
+
+  // ---------- EXPORT ----------
   const exportFormatSelect = document.getElementById('exportFormat');
   const downloadBtn = document.getElementById('downloadBtn');
 
@@ -423,10 +613,8 @@
       "<!DOCTYPE html><html><head><meta charset='UTF-8'></head><body>" +
       content +
       "</body></html>";
-
     const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
     const url = URL.createObjectURL(blob);
-
     const a = document.createElement('a');
     a.href = url;
     a.download = name + '.html';
@@ -436,16 +624,14 @@
     URL.revokeObjectURL(url);
   }
 
-  // Export Word simple : Word ouvre très bien un HTML avec extension .doc
+  // Word ouvre très bien un HTML avec extension .doc
   function downloadDOC(name, content) {
     const html =
       "<!DOCTYPE html><html><head><meta charset='UTF-8'></head><body>" +
       content +
       "</body></html>";
-
     const blob = new Blob([html], { type: 'application/msword;charset=utf-8' });
     const url = URL.createObjectURL(blob);
-
     const a = document.createElement('a');
     a.href = url;
     a.download = name + '.doc';
@@ -479,7 +665,7 @@
 
   downloadBtn.addEventListener('click', downloadCurrentDocument);
 
-  // ---------- OUVERTURE DE FICHIERS (depuis le PC) ----------
+  // ---------- OUVERTURE DE FICHIERS ----------
   const openFileBtn = document.getElementById('openFileBtn');
   const fileInput = document.getElementById('fileInput');
 
@@ -504,14 +690,15 @@
           .replace(/>/g, '&gt;')
           .replace(/\n/g, '<br>');
       } else {
-        alert("Format non supporté. Utilise .html, .htm, .txt ou .doc.");
+        alert("Format non supporté. Utilise .html, .htm, .txt ou .doc généré par ce site.");
         return;
       }
 
       editor.dispatchEvent(new Event('input'));
       docNameInput.value = file.name.replace(/\.(html?|txt|doc)$/i, '');
-      storageStatus.textContent = 'Fichier "' + file.name + '" ouvert depuis ton PC.';
+      storageStatus.textContent = 'Fichier "' + file.name + '" ouvert.';
       fileInput.value = '';
+      dirty = true;
     };
 
     reader.readAsText(file);
@@ -558,7 +745,7 @@
     recognition.onstart = () => {
       isListening = true;
       micDot.classList.add('active');
-      micStatusText.textContent = 'Dictée en cours… Parle près du micro.';
+      micStatusText.textContent = 'Dictée en cours…';
       editor.classList.remove('empty');
       if (!interimSpan) {
         interimSpan = document.createElement('span');
