@@ -2,14 +2,14 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <title>Word du navigateur</title>
+  <title>Éditeur type Word dans le navigateur</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- Google Fonts pour un max de polices -->
+  <!-- Google Fonts (polices modernes) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
-    href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Open+Sans:wght@400;600&family=Lato:wght@400;700&family=Montserrat:wght@400;600;700&family=Poppins:wght@400;600&family=Inter:wght@400;600;700&family=Nunito:wght@400;700&family=Raleway:wght@400;600&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Open+Sans:wght@400;600&family=Lato:wght@400;700&family=Montserrat:wght@400;600&family=Poppins:wght@400;600&family=Inter:wght@400;600;700&display=swap"
     rel="stylesheet"
   />
 
@@ -21,8 +21,8 @@
       padding: 0;
       height: 100%;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: radial-gradient(circle at top, #1e293b, #020617);
-      color: #e5e7eb;
+      background: #e5eaef;
+      color: #111827;
     }
 
     body {
@@ -31,11 +31,10 @@
       overflow: hidden;
     }
 
-    /* BARRE DU HAUT (minimaliste) */
     header {
       padding: 8px 10px;
-      background: rgba(15, 23, 42, 0.98);
-      border-bottom: 1px solid #1f2937;
+      background: #f3f4f6;
+      border-bottom: 1px solid #d1d5db;
       display: flex;
       flex-wrap: wrap;
       align-items: center;
@@ -59,17 +58,17 @@
 
     input[type="text"], select {
       padding: 6px 10px;
-      border-radius: 999px;
-      border: 1px solid #4b5563;
-      background: #020617;
-      color: #e5e7eb;
-      max-width: 190px;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+      background: #ffffff;
+      color: #111827;
       font-size: 12px;
+      max-width: 190px;
     }
 
     button {
-      border: none;
-      border-radius: 999px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
       padding: 6px 10px;
       font-size: 12px;
       cursor: pointer;
@@ -77,33 +76,37 @@
       display: inline-flex;
       align-items: center;
       gap: 4px;
-      transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.2s ease;
-      background: #1f2937;
-      color: #e5e7eb;
+      transition: background 0.15s ease, border-color 0.15s ease;
+      background: #ffffff;
+      color: #111827;
       white-space: nowrap;
     }
 
     button:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.4);
-      background: #111827;
-    }
-
-    button:active {
-      transform: translateY(0);
-      box-shadow: none;
+      background: #e5e7eb;
+      border-color: #9ca3af;
     }
 
     .btn-primary {
-      background: #22c55e;
-      color: #052e16;
-      box-shadow: 0 6px 18px rgba(34, 197, 94, 0.4);
+      background: #2563eb;
+      color: #f9fafb;
+      border-color: #1d4ed8;
+    }
+
+    .btn-primary:hover {
+      background: #1d4ed8;
+      border-color: #1d4ed8;
     }
 
     .btn-danger {
       background: #ef4444;
       color: #fef2f2;
-      box-shadow: 0 6px 18px rgba(239, 68, 68, 0.4);
+      border-color: #b91c1c;
+    }
+
+    .btn-danger:hover {
+      background: #dc2626;
+      border-color: #b91c1c;
     }
 
     main {
@@ -115,17 +118,17 @@
       overflow: hidden;
     }
 
-    /* TOOLBAR minimaliste */
+    /* Barre d’outils claire */
     .toolbar {
-      background: rgba(15, 23, 42, 0.9);
+      background: #f9fafb;
       border-radius: 10px;
-      border: 1px solid #1f2937;
+      border: 1px solid #d1d5db;
       padding: 4px 6px;
       display: flex;
       flex-wrap: wrap;
       gap: 4px;
       align-items: center;
-      max-height: 96px;
+      max-height: 100px;
       overflow-x: auto;
     }
 
@@ -138,14 +141,14 @@
       border-radius: 6px;
       font-size: 11px;
       padding: 3px 6px;
-      max-width: 150px;
+      max-width: 160px;
     }
 
     .toolbar-divider {
       width: 1px;
       height: 22px;
-      background: #334155;
-      margin: 0 3px;
+      background: #d1d5db;
+      margin: 0 4px;
     }
 
     .editor-wrapper {
@@ -162,8 +165,8 @@
       color: #000000;
       border-radius: 4px;
       box-shadow:
-        0 18px 32px rgba(15, 23, 42, 0.6),
-        0 0 0 1px rgba(148, 163, 184, 0.12);
+        0 16px 28px rgba(15, 23, 42, 0.2),
+        0 0 0 1px rgba(148, 163, 184, 0.4);
       overflow: auto;
       padding: 20px 24px;
     }
@@ -185,7 +188,7 @@
       justify-content: space-between;
       align-items: center;
       font-size: 11px;
-      color: #9ca3af;
+      color: #6b7280;
       max-width: 1000px;
       width: 100%;
     }
@@ -197,11 +200,11 @@
     }
 
     .dot {
-      width: 10px;
-      height: 10px;
+      width: 9px;
+      height: 9px;
       border-radius: 50%;
       background: #ef4444;
-      box-shadow: 0 0 10px rgba(239, 68, 68, 0.8);
+      box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.4);
       display: none;
     }
 
@@ -212,19 +215,18 @@
 
     @keyframes pulse {
       0% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(1.5); opacity: 0.4; }
+      50% { transform: scale(1.4); opacity: 0.5; }
       100% { transform: scale(1); opacity: 1; }
     }
 
     .warning {
-      color: #f97316;
+      color: #b45309;
       font-size: 11px;
-      margin-top: 2px;
+      margin-top: 4px;
       max-width: 1000px;
       width: 100%;
     }
 
-    /* Layout responsif */
     @media (max-width: 768px) {
       header {
         flex-direction: column;
@@ -246,7 +248,7 @@
 </head>
 <body>
 <header>
-  <h1>Word du navigateur</h1>
+  <h1>Éditeur type Word</h1>
   <div class="header-right">
     <input id="docName" type="text" placeholder="Nom du document" />
     <button id="newDocBtn">Nouveau</button>
@@ -270,39 +272,35 @@
 </header>
 
 <main>
-  <!-- Ruban minimaliste -->
   <div class="toolbar">
-    <!-- Polices (max) -->
+    <!-- Polices -->
     <select id="fontFamilySelect" title="Police">
       <option value="">Police</option>
       <!-- Web safe -->
-      <option value="Arial">Arial</option>
-      <option value="Verdana">Verdana</option>
-      <option value="Tahoma">Tahoma</option>
-      <option value="Trebuchet MS">Trebuchet MS</option>
-      <option value="Times New Roman">Times New Roman</option>
-      <option value="Georgia">Georgia</option>
-      <option value="Courier New">Courier New</option>
-      <option value="Lucida Sans Unicode">Lucida Sans</option>
+      <option value="Arial, sans-serif">Arial</option>
+      <option value="'Trebuchet MS', sans-serif">Trebuchet MS</option>
+      <option value="Verdana, sans-serif">Verdana</option>
+      <option value="Tahoma, sans-serif">Tahoma</option>
+      <option value="'Times New Roman', serif">Times New Roman</option>
+      <option value="Georgia, serif">Georgia</option>
+      <option value="'Courier New', monospace">Courier New</option>
       <!-- Google Fonts -->
-      <option value="Roboto">Roboto</option>
-      <option value="Open Sans">Open Sans</option>
-      <option value="Lato">Lato</option>
-      <option value="Montserrat">Montserrat</option>
-      <option value="Poppins">Poppins</option>
-      <option value="Inter">Inter</option>
-      <option value="Nunito">Nunito</option>
-      <option value="Raleway">Raleway</option>
+      <option value="'Roboto', sans-serif">Roboto</option>
+      <option value="'Open Sans', sans-serif">Open Sans</option>
+      <option value="'Lato', sans-serif">Lato</option>
+      <option value="'Montserrat', sans-serif">Montserrat</option>
+      <option value="'Poppins', sans-serif">Poppins</option>
+      <option value="'Inter', sans-serif">Inter</option>
     </select>
 
     <select id="fontSizeSelect" title="Taille">
       <option value="">Taille</option>
-      <option value="2">Petit</option>
-      <option value="3">Normal</option>
-      <option value="4">Grand</option>
-      <option value="5">Très grand</option>
-      <option value="6">Titre</option>
-      <option value="7">Très gros</option>
+      <option value="12px">12</option>
+      <option value="14px">14</option>
+      <option value="16px">16</option>
+      <option value="18px">18</option>
+      <option value="24px">24</option>
+      <option value="32px">32</option>
     </select>
 
     <div class="toolbar-divider"></div>
@@ -310,7 +308,7 @@
     <button data-cmd="bold" title="Gras"><b>B</b></button>
     <button data-cmd="italic" title="Italique"><i>I</i></button>
     <button data-cmd="underline" title="Souligné"><u>U</u></button>
-    <button data-cmd="removeFormat" title="Effacer la mise en forme">✖</button>
+    <button data-cmd="removeFormat" title="Effacer style">✖</button>
 
     <div class="toolbar-divider"></div>
 
@@ -359,7 +357,7 @@
 
     <div class="toolbar-divider"></div>
 
-    <!-- Paramètres de page -->
+    <!-- Taille de page -->
     <select id="pagePresetSelect" title="Format de page">
       <option value="A4">A4</option>
       <option value="A5">A5</option>
@@ -428,26 +426,54 @@
     });
   });
 
+  // Appliquer police via un span autour de la sélection
+  function applyStyleToSelection(styleCallback) {
+    editor.focus();
+    const sel = window.getSelection();
+    if (!sel || sel.rangeCount === 0) return;
+    const range = sel.getRangeAt(0);
+    if (range.collapsed) {
+      const span = document.createElement('span');
+      styleCallback(span.style);
+      span.textContent = '\u200B'; // espace invisible
+      range.insertNode(span);
+      range.setStart(span, 1);
+      range.collapse(true);
+      sel.removeAllRanges();
+      sel.addRange(range);
+      return;
+    }
+    const selectedContent = range.extractContents();
+    const span = document.createElement('span');
+    styleCallback(span.style);
+    span.appendChild(selectedContent);
+    range.insertNode(span);
+    sel.removeAllRanges();
+    const newRange = document.createRange();
+    newRange.selectNodeContents(span);
+    sel.addRange(newRange);
+  }
+
   fontFamilySelect.addEventListener('change', () => {
     const val = fontFamilySelect.value;
-    if (val) document.execCommand('fontName', false, val);
-    editor.focus();
+    if (!val) return;
+    applyStyleToSelection(style => { style.fontFamily = val; });
   });
 
   fontSizeSelect.addEventListener('change', () => {
     const val = fontSizeSelect.value;
-    if (val) document.execCommand('fontSize', false, val);
-    editor.focus();
+    if (!val) return;
+    applyStyleToSelection(style => { style.fontSize = val; });
   });
 
   colorInput.addEventListener('change', () => {
-    document.execCommand('foreColor', false, colorInput.value);
-    editor.focus();
+    const color = colorInput.value;
+    applyStyleToSelection(style => { style.color = color; });
   });
 
   bgColorInput.addEventListener('change', () => {
-    document.execCommand('hiliteColor', false, bgColorInput.value);
-    editor.focus();
+    const color = bgColorInput.value;
+    applyStyleToSelection(style => { style.backgroundColor = color; });
   });
 
   // ---------- INSERT IMAGE & TABLE ----------
@@ -520,12 +546,11 @@
   const pageHeightInput = document.getElementById('pageHeightInput');
   const applyPageSizeBtn = document.getElementById('applyPageSizeBtn');
 
-  // valeurs approximatives en pixels (avec un ratio écran)
   const pagePresetsPx = {
-    A4:    { w: 794,  h: 1123 },  // ~210x297mm
-    A5:    { w: 559,  h: 794  },  // ~148x210mm
-    Letter:{ w: 816,  h: 1056 },  // 8.5x11"
-    Legal: { w: 816,  h: 1344 }   // 8.5x14"
+    A4:    { w: 794,  h: 1123 },
+    A5:    { w: 559,  h: 794  },
+    Letter:{ w: 816,  h: 1056 },
+    Legal: { w: 816,  h: 1344 }
   };
 
   function applyPreset(preset) {
@@ -537,7 +562,6 @@
     pageHeightInput.value = p.h;
   }
 
-  // initialisation en A4
   applyPreset("A4");
 
   pagePresetSelect.addEventListener('change', () => {
@@ -560,7 +584,7 @@
   });
 
   // ---------- DOCUMENTS (localStorage) ----------
-  const STORAGE_KEY = 'wordNavDocs_v2';
+  const STORAGE_KEY = 'wordEditorDocs_v1';
   const docNameInput = document.getElementById('docName');
   const newDocBtn = document.getElementById('newDocBtn');
   const saveDocBtn = document.getElementById('saveDocBtn');
@@ -691,11 +715,14 @@
     }
   }
 
-  function downloadHTML(name, content) {
-    const html =
-      "<!DOCTYPE html><html><head><meta charset='UTF-8'></head><body>" +
+  function wrapHTML(content) {
+    return "<!DOCTYPE html><html><head><meta charset='UTF-8'></head><body>" +
       content +
       "</body></html>";
+  }
+
+  function downloadHTML(name, content) {
+    const html = wrapHTML(content);
     const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -709,10 +736,7 @@
 
   // Word ouvre très bien un HTML avec extension .doc
   function downloadDOC(name, content) {
-    const html =
-      "<!DOCTYPE html><html><head><meta charset='UTF-8'></head><body>" +
-      content +
-      "</body></html>";
+    const html = wrapHTML(content);
     const blob = new Blob([html], { type: 'application/msword;charset=utf-8' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -737,7 +761,7 @@
 
     const doc = iframe.contentWindow.document;
     doc.open();
-    doc.write("<html><head><meta charset='UTF-8'></head><body>" + content + "</body></html>");
+    doc.write(wrapHTML(content));
     doc.close();
 
     iframe.contentWindow.focus();
