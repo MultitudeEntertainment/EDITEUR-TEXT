@@ -118,7 +118,6 @@
       overflow: hidden;
     }
 
-    /* Barre d’outils claire */
     .toolbar {
       background: #f9fafb;
       border-radius: 10px;
@@ -252,21 +251,21 @@
   <div class="header-right">
     <input id="docName" type="text" placeholder="Nom du document" />
     <button id="newDocBtn">Nouveau</button>
-    <button id="saveDocBtn" class="btn-primary">💾</button>
+    <button id="saveDocBtn" class="btn-primary">Sauvegarder</button>
 
     <select id="docList">
-      <option value="">Docs enregistrés…</option>
+      <option value="">Documents enregistrés…</option>
     </select>
-    <button id="deleteDocBtn" class="btn-danger">🗑️</button>
+    <button id="deleteDocBtn" class="btn-danger">Supprimer</button>
 
     <select id="exportFormat">
       <option value="doc">Word (.doc)</option>
       <option value="html">HTML (.html)</option>
       <option value="pdf">PDF (.pdf)</option>
     </select>
-    <button id="downloadBtn">⬇️</button>
+    <button id="downloadBtn">Télécharger</button>
 
-    <button id="openFileBtn">📂</button>
+    <button id="openFileBtn">Ouvrir un fichier…</button>
     <input id="fileInput" type="file" accept=".html,.htm,.txt,.doc" style="display:none" />
   </div>
 </header>
@@ -305,55 +304,55 @@
 
     <div class="toolbar-divider"></div>
 
-    <button data-cmd="bold" title="Gras"><b>B</b></button>
+    <button data-cmd="bold" title="Gras"><b>G</b></button>
     <button data-cmd="italic" title="Italique"><i>I</i></button>
-    <button data-cmd="underline" title="Souligné"><u>U</u></button>
-    <button data-cmd="removeFormat" title="Effacer style">✖</button>
+    <button data-cmd="underline" title="Souligné"><u>S</u></button>
+    <button data-cmd="removeFormat" title="Effacer la mise en forme">Effacer</button>
 
     <div class="toolbar-divider"></div>
 
-    <button data-cmd="formatBlock" data-value="h1" title="Titre 1">H1</button>
-    <button data-cmd="formatBlock" data-value="h2" title="Titre 2">H2</button>
-    <button data-cmd="formatBlock" data-value="p" title="Paragraphe">P</button>
+    <button data-cmd="formatBlock" data-value="h1" title="Titre 1">Titre 1</button>
+    <button data-cmd="formatBlock" data-value="h2" title="Titre 2">Titre 2</button>
+    <button data-cmd="formatBlock" data-value="p" title="Paragraphe">Paragraphe</button>
 
     <div class="toolbar-divider"></div>
 
-    <button data-cmd="insertUnorderedList" title="Liste à puces">•</button>
-    <button data-cmd="insertOrderedList" title="Liste numérotée">1.</button>
-    <button data-cmd="outdent" title="Diminuer retrait">↤</button>
-    <button data-cmd="indent" title="Augmenter retrait">↦</button>
+    <button data-cmd="insertUnorderedList" title="Liste à puces">Liste •</button>
+    <button data-cmd="insertOrderedList" title="Liste numérotée">Liste 1.</button>
+    <button data-cmd="outdent" title="Diminuer le retrait">Retrait -</button>
+    <button data-cmd="indent" title="Augmenter le retrait">Retrait +</button>
 
     <div class="toolbar-divider"></div>
 
-    <button data-cmd="justifyLeft" title="Aligner à gauche">⟸</button>
-    <button data-cmd="justifyCenter" title="Centrer">≡</button>
-    <button data-cmd="justifyRight" title="Aligner à droite">⟹</button>
+    <button data-cmd="justifyLeft" title="Aligner à gauche">Gauche</button>
+    <button data-cmd="justifyCenter" title="Centrer">Centre</button>
+    <button data-cmd="justifyRight" title="Aligner à droite">Droite</button>
 
     <div class="toolbar-divider"></div>
 
-    <label style="font-size:11px;">T
+    <label style="font-size:11px;">Texte
       <input id="colorInput" type="color"
              style="width:24px;height:20px;border:none;padding:0;margin-left:2px;">
     </label>
-    <label style="font-size:11px;">Sur
+    <label style="font-size:11px;">Surlignage
       <input id="bgColorInput" type="color"
              style="width:24px;height:20px;border:none;padding:0;margin-left:2px;">
     </label>
 
     <div class="toolbar-divider"></div>
 
-    <button id="insertImageBtn" title="Insérer une image">🖼️</button>
-    <button id="insertTableBtn" title="Insérer un tableau">▦</button>
+    <button id="insertImageBtn" title="Insérer une image">Image</button>
+    <button id="insertTableBtn" title="Insérer un tableau">Tableau</button>
 
     <div class="toolbar-divider"></div>
 
-    <button data-cmd="undo" title="Annuler">↺</button>
-    <button data-cmd="redo" title="Rétablir">↻</button>
+    <button data-cmd="undo" title="Annuler">Annuler</button>
+    <button data-cmd="redo" title="Rétablir">Rétablir</button>
 
     <div class="toolbar-divider"></div>
 
-    <button id="startMicBtn" class="btn-primary" title="Démarrer dictée">🎙️</button>
-    <button id="stopMicBtn" class="btn-danger" title="Arrêter dictée">⏹️</button>
+    <button id="startMicBtn" class="btn-primary" title="Démarrer la dictée">Démarrer la dictée</button>
+    <button id="stopMicBtn" class="btn-danger" title="Arrêter la dictée">Arrêter la dictée</button>
 
     <div class="toolbar-divider"></div>
 
@@ -363,13 +362,13 @@
       <option value="A5">A5</option>
       <option value="Letter">Letter</option>
       <option value="Legal">Legal</option>
-      <option value="custom">Perso</option>
+      <option value="custom">Personnalisé</option>
     </select>
-    <input id="pageWidthInput" type="number" min="100" max="2000" placeholder="L (px)"
-           style="width:70px;">
-    <input id="pageHeightInput" type="number" min="100" max="3000" placeholder="H (px)"
-           style="width:70px;">
-    <button id="applyPageSizeBtn" title="Appliquer la taille">↨</button>
+    <input id="pageWidthInput" type="number" min="100" max="2000" placeholder="Largeur (px)"
+           style="width:90px;">
+    <input id="pageHeightInput" type="number" min="100" max="3000" placeholder="Hauteur (px)"
+           style="width:90px;">
+    <button id="applyPageSizeBtn" title="Appliquer la taille">Appliquer</button>
   </div>
 
   <div class="editor-wrapper">
@@ -426,12 +425,14 @@
     });
   });
 
-  // Appliquer police via un span autour de la sélection
+  // Appliquer une police / taille / couleur via un span autour de la sélection
   function applyStyleToSelection(styleCallback) {
     editor.focus();
     const sel = window.getSelection();
     if (!sel || sel.rangeCount === 0) return;
     const range = sel.getRangeAt(0);
+
+    // Si rien n'est sélectionné, on insère un span vide stylé
     if (range.collapsed) {
       const span = document.createElement('span');
       styleCallback(span.style);
@@ -443,6 +444,8 @@
       sel.addRange(range);
       return;
     }
+
+    // Si du texte est sélectionné
     const selectedContent = range.extractContents();
     const span = document.createElement('span');
     styleCallback(span.style);
@@ -476,7 +479,7 @@
     applyStyleToSelection(style => { style.backgroundColor = color; });
   });
 
-  // ---------- INSERT IMAGE & TABLE ----------
+  // ---------- INSERTION D'IMAGE & TABLEAU ----------
   const insertImageBtn = document.getElementById('insertImageBtn');
   const insertTableBtn = document.getElementById('insertTableBtn');
 
@@ -562,6 +565,7 @@
     pageHeightInput.value = p.h;
   }
 
+  // Par défaut : A4
   applyPreset("A4");
 
   pagePresetSelect.addEventListener('change', () => {
@@ -575,7 +579,7 @@
     const w = parseInt(pageWidthInput.value, 10);
     const h = parseInt(pageHeightInput.value, 10);
     if (!w || !h || w < 100 || h < 100) {
-      alert("Entrez une largeur/hauteur valides (>= 100px).");
+      alert("Entrez une largeur et une hauteur valides (au moins 100 pixels).");
       return;
     }
     page.style.width = w + "px";
@@ -584,7 +588,7 @@
   });
 
   // ---------- DOCUMENTS (localStorage) ----------
-  const STORAGE_KEY = 'wordEditorDocs_v1';
+  const STORAGE_KEY = 'editeurWordDocs_v1';
   const docNameInput = document.getElementById('docName');
   const newDocBtn = document.getElementById('newDocBtn');
   const saveDocBtn = document.getElementById('saveDocBtn');
@@ -605,7 +609,7 @@
   function updateDocList(docs = null) {
     if (!docs) docs = loadDocs();
     const currentValue = docListSelect.value;
-    docListSelect.innerHTML = '<option value="">Docs enregistrés…</option>';
+    docListSelect.innerHTML = '<option value="">Documents enregistrés…</option>';
     Object.keys(docs).forEach(name => {
       const opt = document.createElement('option');
       opt.value = name;
@@ -615,7 +619,7 @@
     if (currentValue && docs[currentValue]) {
       docListSelect.value = currentValue;
     }
-    storageStatus.textContent = Object.keys(docs).length + ' doc(s) dans ce navigateur';
+    storageStatus.textContent = Object.keys(docs).length + ' document(s) stocké(s) dans ce navigateur';
   }
 
   function newDocument() {
@@ -623,7 +627,7 @@
     editor.classList.add('empty');
     docNameInput.value = '';
     docListSelect.value = '';
-    storageStatus.textContent = 'Nouveau document.';
+    storageStatus.textContent = 'Nouveau document créé.';
     dirty = false;
   }
 
@@ -639,7 +643,7 @@
       updatedAt: new Date().toISOString()
     };
     saveDocs(docs);
-    storageStatus.textContent = 'Document "' + name + '" sauvegardé.';
+    storageStatus.textContent = 'Document "' + name + '" sauvegardé dans le navigateur.';
     dirty = false;
   }
 
@@ -680,7 +684,7 @@
   updateDocList();
   updateWordCount();
 
-  // ---------- AUTOSAVE ----------
+  // ---------- AUTOSAUVEGARDE ----------
   let dirty = false;
   function markDirty() { dirty = true; }
   setInterval(() => {
@@ -693,7 +697,7 @@
       updatedAt: new Date().toISOString()
     };
     saveDocs(docs);
-    storageStatus.textContent = 'Auto-sauvegarde de "' + name + '".';
+    storageStatus.textContent = 'Auto-sauvegarde du document "' + name + '".';
     dirty = false;
   }, 10000);
 
@@ -734,7 +738,7 @@
     URL.revokeObjectURL(url);
   }
 
-  // Word ouvre très bien un HTML avec extension .doc
+  // Word ouvre très bien un HTML avec l’extension .doc
   function downloadDOC(name, content) {
     const html = wrapHTML(content);
     const blob = new Blob([html], { type: 'application/msword;charset=utf-8' });
@@ -811,7 +815,7 @@
     reader.readAsText(file);
   });
 
-  // ---------- DICTÉE VOCALE ----------
+  // ---------- DICTÉE VOCALE (FR) ----------
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   const startMicBtn = document.getElementById('startMicBtn');
   const stopMicBtn = document.getElementById('stopMicBtn');
@@ -828,7 +832,7 @@
     stopMicBtn.disabled = true;
   } else {
     recognition = new SpeechRecognition();
-    recognition.lang = 'fr-FR';
+    recognition.lang = 'fr-FR'; // assistant vocal en français
     recognition.continuous = true;
     recognition.interimResults = true;
 
@@ -852,7 +856,7 @@
     recognition.onstart = () => {
       isListening = true;
       micDot.classList.add('active');
-      micStatusText.textContent = 'Dictée en cours…';
+      micStatusText.textContent = 'La dictée vocale est en cours. Parle clairement, et ton texte apparaîtra ici.';
       editor.classList.remove('empty');
       if (!interimSpan) {
         interimSpan = document.createElement('span');
@@ -865,7 +869,7 @@
     recognition.onend = () => {
       isListening = false;
       micDot.classList.remove('active');
-      micStatusText.textContent = 'Dictée arrêtée.';
+      micStatusText.textContent = 'La dictée vocale est arrêtée.';
       if (interimSpan) {
         interimSpan.remove();
         interimSpan = null;
@@ -873,7 +877,7 @@
     };
 
     recognition.onerror = (event) => {
-      micStatusText.textContent = 'Erreur dictée : ' + event.error;
+      micStatusText.textContent = "Une erreur est survenue avec la dictée vocale : " + event.error;
       console.error('Erreur de reconnaissance vocale :', event.error);
     };
 
@@ -914,7 +918,7 @@
         try {
           recognition.start();
         } catch (e) {
-          console.warn('Reconnaissance déjà en cours.');
+          console.warn('La dictée est déjà en cours.');
         }
       }
     });
