@@ -4,6 +4,15 @@
   <meta charset="UTF-8" />
   <title>Word du navigateur</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Google Fonts pour un max de polices -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Open+Sans:wght@400;600&family=Lato:wght@400;700&family=Montserrat:wght@400;600;700&family=Poppins:wght@400;600&family=Inter:wght@400;600;700&family=Nunito:wght@400;700&family=Raleway:wght@400;600&display=swap"
+    rel="stylesheet"
+  />
+
   <style>
     * { box-sizing: border-box; }
 
@@ -22,6 +31,7 @@
       overflow: hidden;
     }
 
+    /* BARRE DU HAUT (minimaliste) */
     header {
       padding: 8px 10px;
       background: rgba(15, 23, 42, 0.98);
@@ -47,30 +57,21 @@
       margin-left: auto;
     }
 
-    input[type="text"] {
+    input[type="text"], select {
       padding: 6px 10px;
       border-radius: 999px;
       border: 1px solid #4b5563;
       background: #020617;
       color: #e5e7eb;
-      min-width: 120px;
-      max-width: 180px;
-    }
-
-    select {
-      padding: 6px 10px;
-      border-radius: 999px;
-      border: 1px solid #4b5563;
-      background: #020617;
-      color: #e5e7eb;
-      max-width: 170px;
+      max-width: 190px;
+      font-size: 12px;
     }
 
     button {
       border: none;
       border-radius: 999px;
       padding: 6px 10px;
-      font-size: 13px;
+      font-size: 12px;
       cursor: pointer;
       font-weight: 500;
       display: inline-flex;
@@ -114,9 +115,10 @@
       overflow: hidden;
     }
 
+    /* TOOLBAR minimaliste */
     .toolbar {
       background: rgba(15, 23, 42, 0.9);
-      border-radius: 12px;
+      border-radius: 10px;
       border: 1px solid #1f2937;
       padding: 4px 6px;
       display: flex;
@@ -128,20 +130,20 @@
     }
 
     .toolbar button {
-      border-radius: 8px;
-      padding: 3px 8px;
-      font-size: 12px;
+      border-radius: 6px;
+      padding: 3px 7px;
     }
 
     .toolbar select {
-      border-radius: 8px;
-      font-size: 12px;
+      border-radius: 6px;
+      font-size: 11px;
       padding: 3px 6px;
+      max-width: 150px;
     }
 
     .toolbar-divider {
       width: 1px;
-      height: 24px;
+      height: 22px;
       background: #334155;
       margin: 0 3px;
     }
@@ -156,18 +158,14 @@
     }
 
     .page {
-      width: 100%;
-      max-width: 1000px;
-      height: 100%;
-      max-height: calc(100vh - 160px);
       background: #ffffff;
       color: #000000;
-      border-radius: 6px;
-      padding: 20px 24px;
+      border-radius: 4px;
       box-shadow:
         0 18px 32px rgba(15, 23, 42, 0.6),
-        0 0 0 1px rgba(148, 163, 184, 0.15);
+        0 0 0 1px rgba(148, 163, 184, 0.12);
       overflow: auto;
+      padding: 20px 24px;
     }
 
     #editor {
@@ -226,6 +224,7 @@
       width: 100%;
     }
 
+    /* Layout responsif */
     @media (max-width: 768px) {
       header {
         flex-direction: column;
@@ -236,16 +235,11 @@
         width: 100%;
         justify-content: flex-start;
       }
-      input[type="text"], select {
-        max-width: 130px;
-        font-size: 12px;
-      }
-      button {
-        font-size: 12px;
+      button, input[type="text"], select {
+        font-size: 11px;
       }
       .page {
-        max-height: calc(100vh - 210px);
-        padding: 12px 12px;
+        padding: 12px;
       }
     }
   </style>
@@ -256,7 +250,7 @@
   <div class="header-right">
     <input id="docName" type="text" placeholder="Nom du document" />
     <button id="newDocBtn">Nouveau</button>
-    <button id="saveDocBtn" class="btn-primary">💾 Sauvegarder</button>
+    <button id="saveDocBtn" class="btn-primary">💾</button>
 
     <select id="docList">
       <option value="">Docs enregistrés…</option>
@@ -270,75 +264,118 @@
     </select>
     <button id="downloadBtn">⬇️</button>
 
-    <button id="openFileBtn">📂 Ouvrir</button>
+    <button id="openFileBtn">📂</button>
     <input id="fileInput" type="file" accept=".html,.htm,.txt,.doc" style="display:none" />
   </div>
 </header>
 
 <main>
+  <!-- Ruban minimaliste -->
   <div class="toolbar">
-    <!-- police & taille -->
-    <select id="fontFamilySelect">
+    <!-- Polices (max) -->
+    <select id="fontFamilySelect" title="Police">
       <option value="">Police</option>
+      <!-- Web safe -->
       <option value="Arial">Arial</option>
-      <option value="Georgia">Georgia</option>
-      <option value="Times New Roman">Times</option>
       <option value="Verdana">Verdana</option>
+      <option value="Tahoma">Tahoma</option>
+      <option value="Trebuchet MS">Trebuchet MS</option>
+      <option value="Times New Roman">Times New Roman</option>
+      <option value="Georgia">Georgia</option>
+      <option value="Courier New">Courier New</option>
+      <option value="Lucida Sans Unicode">Lucida Sans</option>
+      <!-- Google Fonts -->
+      <option value="Roboto">Roboto</option>
+      <option value="Open Sans">Open Sans</option>
+      <option value="Lato">Lato</option>
+      <option value="Montserrat">Montserrat</option>
+      <option value="Poppins">Poppins</option>
+      <option value="Inter">Inter</option>
+      <option value="Nunito">Nunito</option>
+      <option value="Raleway">Raleway</option>
     </select>
-    <select id="fontSizeSelect">
+
+    <select id="fontSizeSelect" title="Taille">
       <option value="">Taille</option>
       <option value="2">Petit</option>
       <option value="3">Normal</option>
       <option value="4">Grand</option>
       <option value="5">Très grand</option>
       <option value="6">Titre</option>
+      <option value="7">Très gros</option>
     </select>
+
     <div class="toolbar-divider"></div>
 
-    <button data-cmd="bold"><b>G</b></button>
-    <button data-cmd="italic"><i>I</i></button>
-    <button data-cmd="underline"><u>S</u></button>
-    <button data-cmd="removeFormat">✖ style</button>
+    <button data-cmd="bold" title="Gras"><b>B</b></button>
+    <button data-cmd="italic" title="Italique"><i>I</i></button>
+    <button data-cmd="underline" title="Souligné"><u>U</u></button>
+    <button data-cmd="removeFormat" title="Effacer la mise en forme">✖</button>
+
     <div class="toolbar-divider"></div>
 
-    <button data-cmd="formatBlock" data-value="h1">H1</button>
-    <button data-cmd="formatBlock" data-value="h2">H2</button>
-    <button data-cmd="formatBlock" data-value="p">Parag</button>
+    <button data-cmd="formatBlock" data-value="h1" title="Titre 1">H1</button>
+    <button data-cmd="formatBlock" data-value="h2" title="Titre 2">H2</button>
+    <button data-cmd="formatBlock" data-value="p" title="Paragraphe">P</button>
+
     <div class="toolbar-divider"></div>
 
-    <button data-cmd="insertUnorderedList">• Liste</button>
-    <button data-cmd="insertOrderedList">1. Liste</button>
-    <button data-cmd="outdent">↤</button>
-    <button data-cmd="indent">↦</button>
+    <button data-cmd="insertUnorderedList" title="Liste à puces">•</button>
+    <button data-cmd="insertOrderedList" title="Liste numérotée">1.</button>
+    <button data-cmd="outdent" title="Diminuer retrait">↤</button>
+    <button data-cmd="indent" title="Augmenter retrait">↦</button>
+
     <div class="toolbar-divider"></div>
 
-    <button data-cmd="justifyLeft">⟸</button>
-    <button data-cmd="justifyCenter">≡</button>
-    <button data-cmd="justifyRight">⟹</button>
+    <button data-cmd="justifyLeft" title="Aligner à gauche">⟸</button>
+    <button data-cmd="justifyCenter" title="Centrer">≡</button>
+    <button data-cmd="justifyRight" title="Aligner à droite">⟹</button>
+
     <div class="toolbar-divider"></div>
 
     <label style="font-size:11px;">T
-      <input id="colorInput" type="color" style="width:24px;height:20px;border:none;padding:0;margin-left:2px;">
+      <input id="colorInput" type="color"
+             style="width:24px;height:20px;border:none;padding:0;margin-left:2px;">
     </label>
     <label style="font-size:11px;">Sur
-      <input id="bgColorInput" type="color" style="width:24px;height:20px;border:none;padding:0;margin-left:2px;">
+      <input id="bgColorInput" type="color"
+             style="width:24px;height:20px;border:none;padding:0;margin-left:2px;">
     </label>
+
     <div class="toolbar-divider"></div>
 
-    <button id="insertImageBtn">🖼️ Image</button>
-    <button id="insertTableBtn">▦ Tableau</button>
+    <button id="insertImageBtn" title="Insérer une image">🖼️</button>
+    <button id="insertTableBtn" title="Insérer un tableau">▦</button>
+
     <div class="toolbar-divider"></div>
 
-    <button data-cmd="undo">↺</button>
-    <button data-cmd="redo">↻</button>
+    <button data-cmd="undo" title="Annuler">↺</button>
+    <button data-cmd="redo" title="Rétablir">↻</button>
+
     <div class="toolbar-divider"></div>
 
-    <button id="startMicBtn" class="btn-primary">🎙️</button>
-    <button id="stopMicBtn" class="btn-danger">⏹️</button>
+    <button id="startMicBtn" class="btn-primary" title="Démarrer dictée">🎙️</button>
+    <button id="stopMicBtn" class="btn-danger" title="Arrêter dictée">⏹️</button>
+
+    <div class="toolbar-divider"></div>
+
+    <!-- Paramètres de page -->
+    <select id="pagePresetSelect" title="Format de page">
+      <option value="A4">A4</option>
+      <option value="A5">A5</option>
+      <option value="Letter">Letter</option>
+      <option value="Legal">Legal</option>
+      <option value="custom">Perso</option>
+    </select>
+    <input id="pageWidthInput" type="number" min="100" max="2000" placeholder="L (px)"
+           style="width:70px;">
+    <input id="pageHeightInput" type="number" min="100" max="3000" placeholder="H (px)"
+           style="width:70px;">
+    <button id="applyPageSizeBtn" title="Appliquer la taille">↨</button>
   </div>
 
   <div class="editor-wrapper">
-    <div class="page">
+    <div id="page" class="page">
       <div id="editor" contenteditable="true" class="empty"></div>
     </div>
     <div class="status-bar">
@@ -476,8 +513,54 @@
     sel.addRange(range);
   }
 
+  // ---------- TAILLE DE PAGE ----------
+  const page = document.getElementById('page');
+  const pagePresetSelect = document.getElementById('pagePresetSelect');
+  const pageWidthInput = document.getElementById('pageWidthInput');
+  const pageHeightInput = document.getElementById('pageHeightInput');
+  const applyPageSizeBtn = document.getElementById('applyPageSizeBtn');
+
+  // valeurs approximatives en pixels (avec un ratio écran)
+  const pagePresetsPx = {
+    A4:    { w: 794,  h: 1123 },  // ~210x297mm
+    A5:    { w: 559,  h: 794  },  // ~148x210mm
+    Letter:{ w: 816,  h: 1056 },  // 8.5x11"
+    Legal: { w: 816,  h: 1344 }   // 8.5x14"
+  };
+
+  function applyPreset(preset) {
+    const p = pagePresetsPx[preset];
+    if (!p) return;
+    page.style.width = p.w + "px";
+    page.style.height = p.h + "px";
+    pageWidthInput.value = p.w;
+    pageHeightInput.value = p.h;
+  }
+
+  // initialisation en A4
+  applyPreset("A4");
+
+  pagePresetSelect.addEventListener('change', () => {
+    const val = pagePresetSelect.value;
+    if (val !== "custom") {
+      applyPreset(val);
+    }
+  });
+
+  applyPageSizeBtn.addEventListener('click', () => {
+    const w = parseInt(pageWidthInput.value, 10);
+    const h = parseInt(pageHeightInput.value, 10);
+    if (!w || !h || w < 100 || h < 100) {
+      alert("Entrez une largeur/hauteur valides (>= 100px).");
+      return;
+    }
+    page.style.width = w + "px";
+    page.style.height = h + "px";
+    pagePresetSelect.value = "custom";
+  });
+
   // ---------- DOCUMENTS (localStorage) ----------
-  const STORAGE_KEY = 'wordNavDocs_v1';
+  const STORAGE_KEY = 'wordNavDocs_v2';
   const docNameInput = document.getElementById('docName');
   const newDocBtn = document.getElementById('newDocBtn');
   const saveDocBtn = document.getElementById('saveDocBtn');
