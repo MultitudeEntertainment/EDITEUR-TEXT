@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Mini Word du navigateur</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #1e293b, #020617);
+      color: #e5e7eb;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      padding: 10px 16px;
+      background: rgba(15, 23, 42, 0.98);
+      border-bottom: 1px solid #1f2937;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+    }
+
+    header h1 {
+      font-size: 18px;
+      margin: 0;
+      white-space: nowrap;
+    }
+
+    .header-right {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin-left: auto;
+    }
+
+    input[type="text"] {
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid #4b5563;
+      background: #020617;
+      color: #e5e7eb;
+      min-width: 160px;
+    }
+
+    select {
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid #4b5563;
+      background: #020617;
+      color: #e5e7eb;
+      min-width: 150px;
+    }
+
+    button {
+      border: none;
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-size: 14px;
+      cursor: pointer;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.2s ease;
+      background: #1f2937;
+      color: #e5e7eb;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.4);
+      background: #111827;
+    }
+
+    button:active {
+      transform: translateY(0);
+      box-shadow: none;
+    }
+
+    .btn-primary {
+      background: #22c55e;
+      color: #052e16;
+      box-shadow: 0 6px 18px rgba(34, 197, 94, 0.4);
+    }
+
+    .btn-danger {
+      background: #ef4444;
+      color: #fef2f2;
+      box-shadow: 0 6px 18px rgba(239, 68, 68, 0.4);
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 12px 16px 16px;
+      gap: 8px;
+    }
+
+    .toolbar {
+      background: rgba(15, 23, 42, 0.9);
+      border-radius: 999px;
+      border: 1px solid #1f2937;
+      padding: 4px 8px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
+      align-items: center;
+    }
+
+    .toolbar button {
+      border-radius: 8px;
+      padding: 4px 8px;
+      font-size: 13px;
+    }
+
+    .toolbar-divider {
+      width: 1px;
+      height: 24px;
+      background: #334155;
+      margin: 0 4px;
+    }
+
+    .editor-container {
+      flex: 1;
+      margin-top: 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      overflow: auto;
+    }
+
+    .page {
+      width: 100%;
+      max-width: 900px;
+      min-height: 600px;
+      background: #ffffff;
+      color: #000000;
+      border-radius: 8px;
+      margin-top: 8px;
+      padding: 32px 40px;
+      box-shadow:
+        0 20px 40px rgba(15, 23, 42, 0.6),
+        0 0 0 1px rgba(148, 163, 184, 0.15);
+      overflow: auto;
+    }
+
+    #editor {
+      outline: none;
+      min-height: 500px;
+      white-space: pre-wrap;
+    }
+
+    #editor.empty::before {
+      content: "Commence à écrire ou utilise le micro…";
+      color: #9ca3af;
+    }
+
+    .status-bar {
+      margin-top: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      color: #9ca3af;
+      max-width: 900px;
+      width: 100%;
+    }
+
+    .mic-status {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #ef4444;
+      box-shadow: 0 0 10px rgba(239, 68, 68, 0.8);
+      display: none;
+    }
+
+    .dot.active {
+      display: inline-block;
+      animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.5); opacity: 0.4; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .warning {
+      color: #f97316;
+      font-size: 12px;
+      margin-top: 4px;
+      max-width: 900px;
+      width: 100%;
+    }
+
+    @media (max-width: 900px) {
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .header-right {
+        margin-left: 0;
+      }
+      .page {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+<header>
+  <h1>Mini Word du navigateur</h1>
+  <div class="header-right">
+    <input id="docName" type="text" placeholder="Nom du document" />
+    <button id="newDocBtn">Nouveau</button>
+    <button id="saveDocBtn" class="btn-primary">💾 Sauvegarder</button>
+
+    <select id="docList">
+      <option value="">Docs enregistrés…</option>
+    </select>
+    <button id="deleteDocBtn" class="btn-danger">🗑️ Supprimer</button>
+
+    <select id="exportFormat">
+      <option value="doc">Word (.doc)</option>
+      <option value="html">HTML (.html)</option>
+      <option value="pdf">PDF (.pdf)</option>
+    </select>
+    <button id="downloadBtn">⬇️ Télécharger</button>
+
+    <button id="openFileBtn">📂 Ouvrir fichier…</button>
+    <input id="fileInput" type="file" accept=".html,.htm,.txt,.doc" style="display:none" />
+  </div>
+</header>
+
+<main>
+  <div class="toolbar">
+    <button data-cmd="bold"><b>Gras</b></button>
+    <button data-cmd="italic"><i>Italique</i></button>
+    <button data-cmd="underline"><u>Souligné</u></button>
+    <div class="toolbar-divider"></div>
+    <button data-cmd="formatBlock" data-value="h1">Titre 1</button>
+    <button data-cmd="formatBlock" data-value="h2">Titre 2</button>
+    <button data-cmd="formatBlock" data-value="p">Paragraphe</button>
+    <div class="toolbar-divider"></div>
+    <button data-cmd="insertUnorderedList">• Liste</button>
+    <button data-cmd="insertOrderedList">1. Liste</button>
+    <div class="toolbar-divider"></div>
+    <button data-cmd="justifyLeft">↤ Gauche</button>
+    <button data-cmd="justifyCenter">≡ Centre</button>
+    <button data-cmd="justifyRight">↦ Droite</button>
+    <div class="toolbar-divider"></div>
+    <button id="startMicBtn" class="btn-primary">🎙️ Démarrer dictée</button>
+    <button id="stopMicBtn" class="btn-danger">⏹️ Stop dictée</button>
+  </div>
+
+  <div class="editor-container">
+    <div class="page">
+      <div id="editor" contenteditable="true" class="empty"></div>
+    </div>
+    <div class="status-bar">
+      <div class="mic-status">
+        <span class="dot" id="micDot"></span>
+        <span id="micStatusText"></span>
+      </div>
+      <div id="storageStatus"></div>
+    </div>
+    <div class="warning" id="speechWarning" style="display:none;">
+      L’API de reconnaissance vocale n’est pas supportée sur ce navigateur. Utilise de préférence Chrome ou Edge.
+    </div>
+  </div>
+</main>
+
+<script>
+  // ---------- ÉDITEUR ----------
+  const editor = document.getElementById('editor');
+  const toolbarButtons = document.querySelectorAll('.toolbar button[data-cmd]');
+
+  editor.addEventListener('input', () => {
+    if (editor.textContent.trim().length === 0 && editor.innerHTML.trim() === '') {
+      editor.classList.add('empty');
+    } else {
+      editor.classList.remove('empty');
+    }
+  });
+
+  toolbarButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const cmd = btn.getAttribute('data-cmd');
+      const value = btn.getAttribute('data-value') || null;
+      document.execCommand(cmd, false, value);
+      editor.focus();
+    });
+  });
+
+  // ---------- DOCUMENTS (localStorage) ----------
+  const STORAGE_KEY = 'miniWordDocs_v1';
+  const docNameInput = document.getElementById('docName');
+  const newDocBtn = document.getElementById('newDocBtn');
+  const saveDocBtn = document.getElementById('saveDocBtn');
+  const docListSelect = document.getElementById('docList');
+  const deleteDocBtn = document.getElementById('deleteDocBtn');
+  const storageStatus = document.getElementById('storageStatus');
+
+  function loadDocs() {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : {};
+  }
+
+  function saveDocs(docs) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(docs));
+    updateDocList(docs);
+  }
+
+  function updateDocList(docs = null) {
+    if (!docs) docs = loadDocs();
+    const currentValue = docListSelect.value;
+    docListSelect.innerHTML = '<option value="">Docs enregistrés…</option>';
+    Object.keys(docs).forEach(name => {
+      const opt = document.createElement('option');
+      opt.value = name;
+      opt.textContent = name;
+      docListSelect.appendChild(opt);
+    });
+    if (currentValue && docs[currentValue]) {
+      docListSelect.value = currentValue;
+    }
+    storageStatus.textContent = Object.keys(docs).length + ' document(s) stocké(s) dans ce navigateur';
+  }
+
+  function newDocument() {
+    editor.innerHTML = '';
+    editor.classList.add('empty');
+    docNameInput.value = '';
+    docListSelect.value = '';
+    storageStatus.textContent = 'Nouveau document.';
+  }
+
+  function saveCurrentDocument() {
+    const name = docNameInput.value.trim();
+    if (!name) {
+      alert('Donne un nom au document avant de sauvegarder.');
+      return;
+    }
+    const docs = loadDocs();
+    docs[name] = {
+      content: editor.innerHTML,
+      updatedAt: new Date().toISOString()
+    };
+    saveDocs(docs);
+    storageStatus.textContent = 'Document "' + name + '" sauvegardé dans le navigateur.';
+  }
+
+  function loadSelectedDocument() {
+    const name = docListSelect.value;
+    if (!name) return;
+    const docs = loadDocs();
+    const doc = docs[name];
+    if (!doc) return;
+    editor.innerHTML = doc.content || '';
+    editor.dispatchEvent(new Event('input'));
+    docNameInput.value = name;
+    storageStatus.textContent = 'Document "' + name + '" chargé depuis le navigateur.';
+  }
+
+  function deleteSelectedDocument() {
+    const name = docListSelect.value;
+    if (!name) {
+      alert('Choisis un document à supprimer.');
+      return;
+    }
+    if (!confirm('Supprimer le document "' + name + '" ?')) return;
+    const docs = loadDocs();
+    delete docs[name];
+    saveDocs(docs);
+    if (docNameInput.value === name) {
+      newDocument();
+    }
+    storageStatus.textContent = 'Document "' + name + '" supprimé.';
+  }
+
+  newDocBtn.addEventListener('click', newDocument);
+  saveDocBtn.addEventListener('click', saveCurrentDocument);
+  docListSelect.addEventListener('change', loadSelectedDocument);
+  deleteDocBtn.addEventListener('click', deleteSelectedDocument);
+
+  updateDocList();
+
+  // ---------- EXPORT (Word / HTML / PDF) ----------
+  const exportFormatSelect = document.getElementById('exportFormat');
+  const downloadBtn = document.getElementById('downloadBtn');
+
+  function downloadCurrentDocument() {
+    const name = (docNameInput.value.trim() || 'document');
+    const format = exportFormatSelect.value;
+    const content = editor.innerHTML;
+
+    if (format === 'html') {
+      downloadHTML(name, content);
+    } else if (format === 'doc') {
+      downloadDOC(name, content);
+    } else if (format === 'pdf') {
+      downloadPDF(name, content);
+    }
+  }
+
+  function downloadHTML(name, content) {
+    const html =
+      "<!DOCTYPE html><html><head><meta charset='UTF-8'></head><body>" +
+      content +
+      "</body></html>";
+
+    const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = name + '.html';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  // Export Word simple : Word ouvre très bien un HTML avec extension .doc
+  function downloadDOC(name, content) {
+    const html =
+      "<!DOCTYPE html><html><head><meta charset='UTF-8'></head><body>" +
+      content +
+      "</body></html>";
+
+    const blob = new Blob([html], { type: 'application/msword;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = name + '.doc';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+
+  function downloadPDF(name, content) {
+    const iframe = document.createElement('iframe');
+    iframe.style.position = 'fixed';
+    iframe.style.right = '0';
+    iframe.style.bottom = '0';
+    iframe.style.width = '0';
+    iframe.style.height = '0';
+    iframe.style.border = '0';
+
+    document.body.appendChild(iframe);
+
+    const doc = iframe.contentWindow.document;
+    doc.open();
+    doc.write("<html><head><meta charset='UTF-8'></head><body>" + content + "</body></html>");
+    doc.close();
+
+    iframe.contentWindow.focus();
+    iframe.contentWindow.print();
+
+    setTimeout(() => iframe.remove(), 1000);
+  }
+
+  downloadBtn.addEventListener('click', downloadCurrentDocument);
+
+  // ---------- OUVERTURE DE FICHIERS (depuis le PC) ----------
+  const openFileBtn = document.getElementById('openFileBtn');
+  const fileInput = document.getElementById('fileInput');
+
+  openFileBtn.addEventListener('click', () => fileInput.click());
+
+  fileInput.addEventListener('change', () => {
+    const file = fileInput.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+
+    reader.onload = e => {
+      const text = e.target.result;
+      const lowerName = file.name.toLowerCase();
+
+      if (lowerName.endsWith('.html') || lowerName.endsWith('.htm') || lowerName.endsWith('.doc')) {
+        editor.innerHTML = text;
+      } else if (lowerName.endsWith('.txt')) {
+        editor.innerHTML = text
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/\n/g, '<br>');
+      } else {
+        alert("Format non supporté. Utilise .html, .htm, .txt ou .doc.");
+        return;
+      }
+
+      editor.dispatchEvent(new Event('input'));
+      docNameInput.value = file.name.replace(/\.(html?|txt|doc)$/i, '');
+      storageStatus.textContent = 'Fichier "' + file.name + '" ouvert depuis ton PC.';
+      fileInput.value = '';
+    };
+
+    reader.readAsText(file);
+  });
+
+  // ---------- DICTÉE VOCALE ----------
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const startMicBtn = document.getElementById('startMicBtn');
+  const stopMicBtn = document.getElementById('stopMicBtn');
+  const micDot = document.getElementById('micDot');
+  const micStatusText = document.getElementById('micStatusText');
+  const speechWarning = document.getElementById('speechWarning');
+
+  let recognition = null;
+  let isListening = false;
+
+  if (!SpeechRecognition) {
+    speechWarning.style.display = 'block';
+    startMicBtn.disabled = true;
+    stopMicBtn.disabled = true;
+  } else {
+    recognition = new SpeechRecognition();
+    recognition.lang = 'fr-FR';
+    recognition.continuous = true;
+    recognition.interimResults = true;
+
+    let interimSpan = null;
+
+    function insertTextAtCursor(text) {
+      editor.focus();
+      const sel = window.getSelection();
+      if (!sel || sel.rangeCount === 0) {
+        editor.appendChild(document.createTextNode(text));
+        return;
+      }
+      const range = sel.getRangeAt(0);
+      range.deleteContents();
+      range.insertNode(document.createTextNode(text));
+      range.collapse(false);
+      sel.removeAllRanges();
+      sel.addRange(range);
+    }
+
+    recognition.onstart = () => {
+      isListening = true;
+      micDot.classList.add('active');
+      micStatusText.textContent = 'Dictée en cours… Parle près du micro.';
+      editor.classList.remove('empty');
+      if (!interimSpan) {
+        interimSpan = document.createElement('span');
+        interimSpan.style.opacity = '0.6';
+        interimSpan.style.fontStyle = 'italic';
+        editor.appendChild(interimSpan);
+      }
+    };
+
+    recognition.onend = () => {
+      isListening = false;
+      micDot.classList.remove('active');
+      micStatusText.textContent = 'Dictée arrêtée.';
+      if (interimSpan) {
+        interimSpan.remove();
+        interimSpan = null;
+      }
+    };
+
+    recognition.onerror = (event) => {
+      micStatusText.textContent = 'Erreur dictée : ' + event.error;
+      console.error('Erreur de reconnaissance vocale :', event.error);
+    };
+
+    recognition.onresult = (event) => {
+      let finalText = '';
+      let interimText = '';
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const transcript = event.results[i][0].transcript;
+        if (event.results[i].isFinal) {
+          finalText += transcript + ' ';
+        } else {
+          interimText += transcript;
+        }
+      }
+
+      if (finalText) {
+        if (interimSpan) {
+          interimSpan.remove();
+          interimSpan = null;
+        }
+        insertTextAtCursor(finalText);
+        if (!interimSpan) {
+          interimSpan = document.createElement('span');
+          interimSpan.style.opacity = '0.6';
+          interimSpan.style.fontStyle = 'italic';
+          editor.appendChild(interimSpan);
+        }
+      }
+
+      if (interimSpan) {
+        interimSpan.textContent = interimText;
+      }
+    };
+
+    startMicBtn.addEventListener('click', () => {
+      if (!recognition) return;
+      if (!isListening) {
+        try {
+          recognition.start();
+        } catch (e) {
+          console.warn('Reconnaissance déjà en cours.');
+        }
+      }
+    });
+
+    stopMicBtn.addEventListener('click', () => {
+      if (!recognition) return;
+      if (isListening) {
+        recognition.stop();
+      }
+    });
+  }
+</script>
+</body>
+</html>
