@@ -2,17 +2,8 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <title>Éditeur type Word dans le navigateur</title>
+  <title>Éditeur + assistant + recherche web</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <!-- Google Fonts (polices modernes) -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Open+Sans:wght@400;600&family=Lato:wght@400;700&family=Montserrat:wght@400;600&family=Poppins:wght@400;600&family=Inter:wght@400;600;700&display=swap"
-    rel="stylesheet"
-  />
-
   <style>
     * { box-sizing: border-box; }
 
@@ -150,13 +141,29 @@
       margin: 0 4px;
     }
 
-    .editor-wrapper {
+    .layout {
       flex: 1;
+      display: flex;
+      gap: 8px;
+      overflow: hidden;
+      margin-top: 4px;
+    }
+
+    .editor-wrapper {
+      flex: 2;
       display: flex;
       flex-direction: column;
       align-items: center;
       overflow: hidden;
-      padding-top: 4px;
+    }
+
+    .side-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-width: 260px;
+      max-width: 400px;
     }
 
     .page {
@@ -168,6 +175,9 @@
         0 0 0 1px rgba(148, 163, 184, 0.4);
       overflow: auto;
       padding: 20px 24px;
+      width: 100%;
+      max-width: 1000px;
+      height: 100%;
     }
 
     #editor {
@@ -177,7 +187,7 @@
     }
 
     #editor.empty::before {
-      content: "Commence à écrire ou utilise le micro…";
+      content: "Commence à écrire ou utilise la dictée vocale…";
       color: #9ca3af;
     }
 
@@ -226,6 +236,134 @@
       width: 100%;
     }
 
+    /* Recherche web + assistant */
+    .panel-box {
+      background: #f9fafb;
+      border-radius: 10px;
+      border: 1px solid #d1d5db;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      height: 50%;
+      min-height: 180px;
+    }
+
+    .panel-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #111827;
+    }
+
+    .panel-row {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .panel-row input[type="text"] {
+      flex: 1;
+      max-width: none;
+    }
+
+    .webview {
+      flex: 1;
+      border-radius: 6px;
+      border: 1px solid #d1d5db;
+      overflow: hidden;
+      background: #ffffff;
+    }
+
+    .webview iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    .assistant-chat {
+      flex: 1;
+      border-radius: 6px;
+      border: 1px solid #d1d5db;
+      background: #ffffff;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .assistant-messages {
+      flex: 1;
+      padding: 8px;
+      overflow-y: auto;
+      font-size: 13px;
+    }
+
+    .assistant-message {
+      margin-bottom: 6px;
+      padding: 6px 8px;
+      border-radius: 6px;
+    }
+
+    .assistant-message.user {
+      background: #dbeafe;
+      align-self: flex-end;
+    }
+
+    .assistant-message.bot {
+      background: #e5e7eb;
+      align-self: flex-start;
+    }
+
+    .assistant-input {
+      border-top: 1px solid #e5e7eb;
+      padding: 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .assistant-input-row {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .assistant-input-row textarea {
+      flex: 1;
+      min-height: 40px;
+      max-height: 80px;
+      resize: vertical;
+      padding: 6px 8px;
+      border-radius: 6px;
+      border: 1px solid #d1d5db;
+      font-size: 13px;
+      font-family: inherit;
+    }
+
+    .assistant-input-row button {
+      font-size: 12px;
+      padding: 6px 8px;
+    }
+
+    .assistant-info {
+      font-size: 11px;
+      color: #6b7280;
+    }
+
+    @media (max-width: 900px) {
+      .layout {
+        flex-direction: column;
+      }
+      .side-panel {
+        flex-direction: column;
+        max-width: none;
+        min-width: 100%;
+        height: 50%;
+      }
+      .panel-box {
+        height: auto;
+      }
+    }
+
     @media (max-width: 768px) {
       header {
         flex-direction: column;
@@ -247,7 +385,7 @@
 </head>
 <body>
 <header>
-  <h1>Éditeur type Word</h1>
+  <h1>Éditeur + assistant</h1>
   <div class="header-right">
     <input id="docName" type="text" placeholder="Nom du document" />
     <button id="newDocBtn">Nouveau</button>
@@ -272,26 +410,6 @@
 
 <main>
   <div class="toolbar">
-    <!-- Polices -->
-    <select id="fontFamilySelect" title="Police">
-      <option value="">Police</option>
-      <!-- Web safe -->
-      <option value="Arial, sans-serif">Arial</option>
-      <option value="'Trebuchet MS', sans-serif">Trebuchet MS</option>
-      <option value="Verdana, sans-serif">Verdana</option>
-      <option value="Tahoma, sans-serif">Tahoma</option>
-      <option value="'Times New Roman', serif">Times New Roman</option>
-      <option value="Georgia, serif">Georgia</option>
-      <option value="'Courier New', monospace">Courier New</option>
-      <!-- Google Fonts -->
-      <option value="'Roboto', sans-serif">Roboto</option>
-      <option value="'Open Sans', sans-serif">Open Sans</option>
-      <option value="'Lato', sans-serif">Lato</option>
-      <option value="'Montserrat', sans-serif">Montserrat</option>
-      <option value="'Poppins', sans-serif">Poppins</option>
-      <option value="'Inter', sans-serif">Inter</option>
-    </select>
-
     <select id="fontSizeSelect" title="Taille">
       <option value="">Taille</option>
       <option value="12px">12</option>
@@ -351,12 +469,11 @@
 
     <div class="toolbar-divider"></div>
 
-    <button id="startMicBtn" class="btn-primary" title="Démarrer la dictée">Démarrer la dictée</button>
-    <button id="stopMicBtn" class="btn-danger" title="Arrêter la dictée">Arrêter la dictée</button>
+    <button id="startMicBtn" class="btn-primary" title="Démarrer la dictée">Dictée document</button>
+    <button id="stopMicBtn" class="btn-danger" title="Arrêter la dictée">Stop dictée</button>
 
     <div class="toolbar-divider"></div>
 
-    <!-- Taille de page -->
     <select id="pagePresetSelect" title="Format de page">
       <option value="A4">A4</option>
       <option value="A5">A5</option>
@@ -371,20 +488,62 @@
     <button id="applyPageSizeBtn" title="Appliquer la taille">Appliquer</button>
   </div>
 
-  <div class="editor-wrapper">
-    <div id="page" class="page">
-      <div id="editor" contenteditable="true" class="empty"></div>
-    </div>
-    <div class="status-bar">
-      <div class="mic-status">
-        <span class="dot" id="micDot"></span>
-        <span id="micStatusText"></span>
+  <div class="layout">
+    <!-- ÉDITEUR -->
+    <div class="editor-wrapper">
+      <div id="page" class="page">
+        <div id="editor" contenteditable="true" class="empty"></div>
       </div>
-      <div id="wordCount"></div>
-      <div id="storageStatus"></div>
+      <div class="status-bar">
+        <div class="mic-status">
+          <span class="dot" id="micDot"></span>
+          <span id="micStatusText"></span>
+        </div>
+        <div id="wordCount"></div>
+        <div id="storageStatus"></div>
+      </div>
+      <div class="warning" id="speechWarning" style="display:none;">
+        La dictée vocale du document n’est pas supportée sur ce navigateur. Utilise de préférence Chrome ou Edge.
+      </div>
     </div>
-    <div class="warning" id="speechWarning" style="display:none;">
-      Dictée vocale non supportée sur ce navigateur. Utilise de préférence Chrome ou Edge.
+
+    <!-- PANNEAU DROIT : Recherche web + Assistant -->
+    <div class="side-panel">
+      <!-- Recherche web (Option B) -->
+      <div class="panel-box">
+        <div class="panel-title">Recherche web</div>
+        <div class="panel-row">
+          <input id="searchQuery" type="text" placeholder="Exemple : volcanisme, révolution française…" />
+          <button id="searchBtn">Rechercher</button>
+        </div>
+        <div class="assistant-info">
+          La recherche s’ouvre dans le cadre ci-dessous. Certains sites peuvent refuser l’affichage intégré.
+        </div>
+        <div class="webview">
+          <iframe id="searchFrame" title="Résultats de recherche"></iframe>
+        </div>
+      </div>
+
+      <!-- Assistant texte + audio -->
+      <div class="panel-box">
+        <div class="panel-title">Assistant</div>
+        <div class="assistant-chat">
+          <div id="assistantMessages" class="assistant-messages"></div>
+          <div class="assistant-input">
+            <div class="assistant-input-row">
+              <textarea id="assistantInput" placeholder="Pose une question en français…"></textarea>
+            </div>
+            <div class="assistant-input-row">
+              <button id="assistantMicBtn">🎙️ Dicter la question</button>
+              <button id="assistantSendBtn" class="btn-primary">Envoyer</button>
+              <button id="assistantStopVoiceBtn">🔇 Stop voix</button>
+            </div>
+            <div class="assistant-info">
+              L’assistant répond avec des phrases simples en français et lit ses réponses à voix haute.
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </main>
@@ -393,7 +552,6 @@
   // ---------- ÉDITEUR ----------
   const editor = document.getElementById('editor');
   const toolbarButtons = document.querySelectorAll('.toolbar button[data-cmd]');
-  const fontFamilySelect = document.getElementById('fontFamilySelect');
   const fontSizeSelect = document.getElementById('fontSizeSelect');
   const colorInput = document.getElementById('colorInput');
   const bgColorInput = document.getElementById('bgColorInput');
@@ -425,18 +583,16 @@
     });
   });
 
-  // Appliquer une police / taille / couleur via un span autour de la sélection
   function applyStyleToSelection(styleCallback) {
     editor.focus();
     const sel = window.getSelection();
     if (!sel || sel.rangeCount === 0) return;
     const range = sel.getRangeAt(0);
 
-    // Si rien n'est sélectionné, on insère un span vide stylé
     if (range.collapsed) {
       const span = document.createElement('span');
       styleCallback(span.style);
-      span.textContent = '\u200B'; // espace invisible
+      span.textContent = '\u200B';
       range.insertNode(span);
       range.setStart(span, 1);
       range.collapse(true);
@@ -445,7 +601,6 @@
       return;
     }
 
-    // Si du texte est sélectionné
     const selectedContent = range.extractContents();
     const span = document.createElement('span');
     styleCallback(span.style);
@@ -456,12 +611,6 @@
     newRange.selectNodeContents(span);
     sel.addRange(newRange);
   }
-
-  fontFamilySelect.addEventListener('change', () => {
-    const val = fontFamilySelect.value;
-    if (!val) return;
-    applyStyleToSelection(style => { style.fontFamily = val; });
-  });
 
   fontSizeSelect.addEventListener('change', () => {
     const val = fontSizeSelect.value;
@@ -479,7 +628,7 @@
     applyStyleToSelection(style => { style.backgroundColor = color; });
   });
 
-  // ---------- INSERTION D'IMAGE & TABLEAU ----------
+  // ---------- INSERT IMAGE & TABLE ----------
   const insertImageBtn = document.getElementById('insertImageBtn');
   const insertTableBtn = document.getElementById('insertTableBtn');
 
@@ -565,7 +714,6 @@
     pageHeightInput.value = p.h;
   }
 
-  // Par défaut : A4
   applyPreset("A4");
 
   pagePresetSelect.addEventListener('change', () => {
@@ -588,7 +736,7 @@
   });
 
   // ---------- DOCUMENTS (localStorage) ----------
-  const STORAGE_KEY = 'editeurWordDocs_v1';
+  const STORAGE_KEY = 'editeurAssistantDocs_v1';
   const docNameInput = document.getElementById('docName');
   const newDocBtn = document.getElementById('newDocBtn');
   const saveDocBtn = document.getElementById('saveDocBtn');
@@ -738,7 +886,6 @@
     URL.revokeObjectURL(url);
   }
 
-  // Word ouvre très bien un HTML avec l’extension .doc
   function downloadDOC(name, content) {
     const html = wrapHTML(content);
     const blob = new Blob([html], { type: 'application/msword;charset=utf-8' });
@@ -815,7 +962,7 @@
     reader.readAsText(file);
   });
 
-  // ---------- DICTÉE VOCALE (FR) ----------
+  // ---------- DICTÉE VOCALE DOCUMENT ----------
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   const startMicBtn = document.getElementById('startMicBtn');
   const stopMicBtn = document.getElementById('stopMicBtn');
@@ -832,7 +979,7 @@
     stopMicBtn.disabled = true;
   } else {
     recognition = new SpeechRecognition();
-    recognition.lang = 'fr-FR'; // assistant vocal en français
+    recognition.lang = 'fr-FR';
     recognition.continuous = true;
     recognition.interimResults = true;
 
@@ -856,7 +1003,7 @@
     recognition.onstart = () => {
       isListening = true;
       micDot.classList.add('active');
-      micStatusText.textContent = 'La dictée vocale est en cours. Parle clairement, et ton texte apparaîtra ici.';
+      micStatusText.textContent = "La dictée du document est en cours. Parle près du micro.";
       editor.classList.remove('empty');
       if (!interimSpan) {
         interimSpan = document.createElement('span');
@@ -869,7 +1016,7 @@
     recognition.onend = () => {
       isListening = false;
       micDot.classList.remove('active');
-      micStatusText.textContent = 'La dictée vocale est arrêtée.';
+      micStatusText.textContent = "La dictée du document est arrêtée.";
       if (interimSpan) {
         interimSpan.remove();
         interimSpan = null;
@@ -877,8 +1024,8 @@
     };
 
     recognition.onerror = (event) => {
-      micStatusText.textContent = "Une erreur est survenue avec la dictée vocale : " + event.error;
-      console.error('Erreur de reconnaissance vocale :', event.error);
+      micStatusText.textContent = "Erreur dictée doc : " + event.error;
+      console.error('Erreur de reconnaissance vocale (document) :', event.error);
     };
 
     recognition.onresult = (event) => {
@@ -918,7 +1065,7 @@
         try {
           recognition.start();
         } catch (e) {
-          console.warn('La dictée est déjà en cours.');
+          console.warn('Dictée déjà en cours.');
         }
       }
     });
@@ -930,6 +1077,165 @@
       }
     });
   }
+
+  // ---------- RECHERCHE WEB (Option B) ----------
+  const searchQueryInput = document.getElementById('searchQuery');
+  const searchBtn = document.getElementById('searchBtn');
+  const searchFrame = document.getElementById('searchFrame');
+
+  function performSearch() {
+    const q = searchQueryInput.value.trim();
+    if (!q) return;
+    const url = "https://www.bing.com/search?q=" + encodeURIComponent(q);
+    searchFrame.src = url;
+  }
+
+  searchBtn.addEventListener('click', performSearch);
+  searchQueryInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      performSearch();
+    }
+  });
+
+  // ---------- ASSISTANT TEXTE + AUDIO ----------
+  const assistantMessages = document.getElementById('assistantMessages');
+  const assistantInput = document.getElementById('assistantInput');
+  const assistantSendBtn = document.getElementById('assistantSendBtn');
+  const assistantMicBtn = document.getElementById('assistantMicBtn');
+  const assistantStopVoiceBtn = document.getElementById('assistantStopVoiceBtn');
+
+  let assistantRecognition = null;
+  let assistantListening = false;
+
+  function addAssistantMessage(text, from) {
+    const div = document.createElement('div');
+    div.classList.add('assistant-message', from);
+    div.textContent = text;
+    assistantMessages.appendChild(div);
+    assistantMessages.scrollTop = assistantMessages.scrollHeight;
+  }
+
+  function generateAssistantResponse(question) {
+    const q = question.toLowerCase().trim();
+
+    if (!q) {
+      return "Tu peux m’écrire une phrase ou me poser une question, et je te répondrai simplement.";
+    }
+
+    if (q.includes("bonjour") || q.includes("salut") || q.includes("bonsoir")) {
+      return "Bonjour ! Je suis un petit assistant intégré à cette page. Tu peux me poser des questions en français.";
+    }
+
+    if (q.includes("qui es-tu") || q.includes("tu es qui")) {
+      return "Je suis un assistant très simple intégré dans ce site. Je ne suis pas connecté à Internet, mais j’essaie de te répondre avec des phrases claires.";
+    }
+
+    if (q.includes("aide") || q.includes("comment utiliser") || q.includes("comment ça marche")) {
+      return "Tu peux écrire ton texte dans l’éditeur à gauche, le sauvegarder dans ton navigateur, le télécharger en Word, HTML ou PDF, et utiliser la dictée vocale pour écrire plus vite.";
+    }
+
+    if (q.includes("dictée") || q.includes("micro") || q.includes("parler")) {
+      return "Pour utiliser la dictée vocale, clique sur “Dictée document” ou sur le bouton micro de l’assistant, autorise le micro, puis parle distinctement.";
+    }
+
+    if (q.includes("sauvegarder") || q.includes("enregistrer")) {
+      return "Pour sauvegarder ton document, donne-lui un nom en haut à droite, puis clique sur le bouton “Sauvegarder”. Le document reste uniquement dans ton navigateur.";
+    }
+
+    if (q.includes("télécharger") || q.includes("pdf") || q.includes("word") || q.includes("html")) {
+      return "Tu peux télécharger ton texte en Word (.doc), en HTML (.html) ou en PDF (.pdf) en choisissant le format puis en cliquant sur “Télécharger”.";
+    }
+
+    return "Je ne suis pas un assistant très avancé, mais j’ai bien compris que tu as écrit : \"" +
+           question.trim() +
+           "\". Si tu veux, reformule ta demande ou précise ce que tu aimerais que j’explique.";
+  }
+
+  function speak(text) {
+    if (!('speechSynthesis' in window)) {
+      return;
+    }
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = 'fr-FR';
+    window.speechSynthesis.speak(utterance);
+  }
+
+  assistantSendBtn.addEventListener('click', () => {
+    const text = assistantInput.value.trim();
+    if (!text) return;
+    addAssistantMessage(text, 'user');
+    assistantInput.value = '';
+    const response = generateAssistantResponse(text);
+    addAssistantMessage(response, 'bot');
+    speak(response);
+  });
+
+  assistantInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      assistantSendBtn.click();
+    }
+  });
+
+  assistantStopVoiceBtn.addEventListener('click', () => {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+    }
+  });
+
+  if (SpeechRecognition) {
+    assistantRecognition = new SpeechRecognition();
+    assistantRecognition.lang = 'fr-FR';
+    assistantRecognition.continuous = false;
+    assistantRecognition.interimResults = false;
+
+    assistantRecognition.onstart = () => {
+      assistantListening = true;
+      addAssistantMessage("Tu peux dicter ta question, je t’écoute.", 'bot');
+    };
+
+    assistantRecognition.onend = () => {
+      assistantListening = false;
+    };
+
+    assistantRecognition.onerror = (event) => {
+      addAssistantMessage("Il y a eu un problème avec le micro de l’assistant : " + event.error, 'bot');
+      console.error("Erreur assistant vocal :", event.error);
+    };
+
+    assistantRecognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript;
+      assistantInput.value = transcript;
+      addAssistantMessage(transcript, 'user');
+      const response = generateAssistantResponse(transcript);
+      addAssistantMessage(response, 'bot');
+      speak(response);
+    };
+
+    assistantMicBtn.addEventListener('click', () => {
+      if (!assistantRecognition) return;
+      if (!assistantListening) {
+        try {
+          assistantRecognition.start();
+        } catch (e) {
+          console.warn("Assistant vocal déjà en cours.");
+        }
+      }
+    });
+  } else {
+    assistantMicBtn.disabled = true;
+    addAssistantMessage("Ton navigateur ne supporte pas la dictée vocale pour l’assistant. Tu peux quand même écrire tes questions au clavier.", 'bot');
+  }
+
+  // Message de bienvenue de l’assistant
+  addAssistantMessage(
+    "Bonjour ! Je suis un assistant intégré à cette page. " +
+    "Tu peux me poser des questions en français, et je te répondrai avec de petites explications simples. " +
+    "Tu peux aussi activer la lecture à voix haute avec le bouton “Envoyer”, ou dicter ta question avec le micro.",
+    'bot'
+  );
 </script>
 </body>
 </html>
